@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fuzzy VLOOKUP Template for Google Sheets | Snakbacks</title>
+<meta name="description" content="VLOOKUP needs an exact match. Real data is not exact: &quot;ACME Pty. Ltd&quot; in one list, &quot;Acme Pty Ltd&quot; in another, &quot;Inytech&quot; typed for &quot;Initech&quot;, &quot;Corp...">
+<link rel="canonical" href="https://www.snakbacks.com/fuzzy-vlookup-template-google-sheets">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1a5fa0">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Snakbacks">
+<meta property="og:title" content="Fuzzy VLOOKUP Template for Google Sheets | Snakbacks">
+<meta property="og:description" content="VLOOKUP needs an exact match. Real data is not exact: &quot;ACME Pty. Ltd&quot; in one list, &quot;Acme Pty Ltd&quot; in another, &quot;Inytech&quot; typed for &quot;Initech&quot;, &quot;Corp...">
+<meta property="og:url" content="https://www.snakbacks.com/fuzzy-vlookup-template-google-sheets">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Fuzzy VLOOKUP Template for Google Sheets","author":{"@type":"Organization","name":"Snakbacks"},"publisher":{"@type":"Organization","name":"Snakbacks"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<nav aria-label="Main"><ul class="nav">
+<li><a href="/#products">Products</a></li>
+<li><a href="/guides" aria-current="page">Guides</a></li>
+<li><a href="/pro">Pro</a></li>
+<li><a href="/takeover">Takeover</a></li>
+<li><a href="/about">About</a></li>
+</ul></nav>
+</div></header>
+<main id="main">
+<div class="wrap"><article class="page-head prose">
+<p class="crumbs"><a href="/">Home</a> / <a href="/guides">Guides</a> / <a href="/guides#lookups">Lookups and matching</a></p>
+<h1 style="font-size:clamp(1.8rem,5vw,2.6rem)">Fuzzy VLOOKUP Template for Google Sheets</h1>
+<p class="ailine">Written with AI assistance; tested in a real Google Sheet.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<p>VLOOKUP needs an exact match. Real data is not exact: &quot;ACME Pty. Ltd&quot; in one list, &quot;Acme Pty Ltd&quot; in another, &quot;Inytech&quot; typed for &quot;Initech&quot;, &quot;Corp Umbrella&quot; for &quot;Umbrella Corp&quot;. The Fuzzy Match Template adds three formulas to Google Sheets that find the closest match anyway.</p>
+<h2>What you get</h2>
+<ul><li><strong>FUZZYMATCH(values, lookup, [threshold])</strong> returns the closest name from your clean list for every messy name. One formula fills the whole column.</li><li><strong>FUZZYLOOKUP(values, lookup, return_range, [threshold])</strong> is a fuzzy XLOOKUP: it finds the closest row and returns any column from it, such as an account ID or email.</li><li><strong>FUZZYSCORE(a, b)</strong> returns a similarity from 0 to 1, so you can review borderline pairs yourself.</li><li>A template sheet with the formulas already installed and a worked example, a copy-and-paste version of the code for your other sheets, and a short PDF guide.</li></ul>
+<h2>How it behaves</h2>
+<p>Tested in a real Google Sheet with the included example:</p>
+<ul><li>&quot;ACME Pty. Ltd&quot; finds Acme Pty Ltd (score 1, punctuation and case ignored)</li><li>&quot;Inytech&quot; finds Initech (score 0.924)</li><li>&quot;Corp Umbrella&quot; finds Umbrella Corp (word order ignored)</li><li>&quot;Wayne Enterprises&quot; stays blank, because nothing in the list is close enough, instead of guessing</li></ul>
+<p>The threshold (default 0.8) sets how close a match must be. Raise it to be stricter, lower it to catch looser matches.</p>
+<h2>Who it is for</h2>
+<ul><li>People whose Google Workspace admin blocks add-ons. There is nothing to install or approve: the code lives in your own sheet.</li><li>Anyone reconciling two lists: customers, suppliers, products, survey answers.</li><li>People who want to own and read the code. Nothing is sent anywhere.</li></ul>
+<h2>Limits</h2>
+<ul><li>It compares how text looks. It cannot know that &quot;Bob&quot; and &quot;Robert&quot; are the same person.</li><li>Speed: in our tests 1,000 names against a 1,000-name list finished in about 15 seconds. Google stops a custom formula after 30 seconds, so split larger lists into chunks.</li><li>Google Sheets only, not Excel.</li></ul>
+<h2>Price</h2>
+<p>US$9, one-time, with a 30-day refund if it does not work for you: <a href="https://snakback.gumroad.com/l/fuzzy-formulas">snakback.gumroad.com/l/fuzzy-formulas</a></p>
+<p>Prefer to do it with plain formulas? The free guide shows three ways: <a href="/fuzzy-match-google-sheets">How to Fuzzy Match in Google Sheets (3 Ways)</a></p>
+<p>Snakbacks publishes the Duplicate Remover and Fuzzy Match add-ons.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<div class="related"><h2 style="font-size:1.2rem;margin-top:0">More lookups and matching guides</h2><ul class="guide-list"><li><a href="/vlookup-na-error-google-sheets">VLOOKUP Returns #N/A in Google Sheets: Causes and Fixes</a></li><li><a href="/vlookup-partial-match-google-sheets">VLOOKUP Partial Match in Google Sheets (Wildcards, Contains)</a></li><li><a href="/xlookup-google-sheets">XLOOKUP in Google Sheets: Syntax, Wildcards and Examples</a></li><li><a href="/index-match-google-sheets">INDEX MATCH in Google Sheets: Syntax, Examples, vs VLOOKUP</a></li></ul><p><a href="/guides">All guides</a></p></div>
+</article></div>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div class="foot-grid">
+<div><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<p class="muted">A small Australian studio making Google Sheets add-ons.</p>
+<p>info@snakbacks.com<br>PO Box 1400, Burpengary D.C. QLD 4505, Australia</p></div>
+<div><h2>Products</h2><ul>
+<li><a href="/fuzzy-match">Fuzzy Match</a></li><li><a href="/duplicate-remover">Duplicate Remover</a></li><li><a href="/pro">Snakbacks Pro</a></li></ul></div>
+<div><h2>Resources</h2><ul>
+<li><a href="/guides">Guides</a></li><li><a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a></li><li><a href="https://snakback.gumroad.com/l/data-cleanup-kit">Data Cleanup Kit</a></li><li><a href="https://snakback.gumroad.com/l/levenshtein-starter">Levenshtein starter (free)</a></li></ul></div>
+<div><h2>Studio</h2><ul>
+<li><a href="/about">About</a></li><li><a href="/takeover">Add-on takeover</a></li><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="mailto:info@snakbacks.com">Contact</a></li></ul></div>
+</div>
+<p class="fine">Google Sheets, Google Workspace and Google Workspace Marketplace are trademarks of Google LLC. Snakbacks is not affiliated with or endorsed by Google. No tracking or analytics on this site.</p>
+</div></footer>
+</body>
+</html>

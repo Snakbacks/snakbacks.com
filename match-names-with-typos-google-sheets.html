@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Match Names with Typos in Google Sheets (Fuzzy Name Matching) | Snakbacks</title>
+<meta name="description" content="Names that should match but do not are a daily Sheets problem: &quot;Smith, John&quot; against &quot;John Smith&quot;, &quot;Jon&quot; against &quot;John&quot;, &quot;Dr. J. Smith&quot; against &quot;John...">
+<link rel="canonical" href="https://www.snakbacks.com/match-names-with-typos-google-sheets">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1a5fa0">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Snakbacks">
+<meta property="og:title" content="Match Names with Typos in Google Sheets (Fuzzy Name Matching) | Snakbacks">
+<meta property="og:description" content="Names that should match but do not are a daily Sheets problem: &quot;Smith, John&quot; against &quot;John Smith&quot;, &quot;Jon&quot; against &quot;John&quot;, &quot;Dr. J. Smith&quot; against &quot;John...">
+<meta property="og:url" content="https://www.snakbacks.com/match-names-with-typos-google-sheets">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Match Names with Typos in Google Sheets (Fuzzy Name Matching)","author":{"@type":"Organization","name":"Snakbacks"},"publisher":{"@type":"Organization","name":"Snakbacks"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<nav aria-label="Main"><ul class="nav">
+<li><a href="/#products">Products</a></li>
+<li><a href="/guides" aria-current="page">Guides</a></li>
+<li><a href="/pro">Pro</a></li>
+<li><a href="/takeover">Takeover</a></li>
+<li><a href="/about">About</a></li>
+</ul></nav>
+</div></header>
+<main id="main">
+<div class="wrap"><article class="page-head prose">
+<p class="crumbs"><a href="/">Home</a> / <a href="/guides">Guides</a> / <a href="/guides#lookups">Lookups and matching</a></p>
+<h1 style="font-size:clamp(1.8rem,5vw,2.6rem)">Match Names with Typos in Google Sheets (Fuzzy Name Matching)</h1>
+<p class="ailine">Written with AI assistance; tested in a real Google Sheet.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<p>Names that should match but do not are a daily Sheets problem: &quot;Smith, John&quot; against &quot;John Smith&quot;, &quot;Jon&quot; against &quot;John&quot;, &quot;Dr. J. Smith&quot; against &quot;John Smith&quot;. Standard lookups need an exact match. This page starts with cleaning, which fixes most cases, then moves to similarity scores for what is left.</p>
+<h2>The sample data</h2>
+<p>Names A2:A4: Smith, John / JOHN  SMITH / Jon Smith. The master list is John Smith, in D2, with ID 101 in E2. Row 1 holds headers.</p>
+<h2>Step 1: clean the obvious differences</h2>
+<p>Most &quot;typos&quot; are formatting. Fix those first and a normal lookup works.</p>
+<h3>Flip &quot;Last, First&quot;</h3>
+<pre><code>=IF(ISNUMBER(SEARCH(&quot;,&quot;,A2)),TRIM(REGEXREPLACE(A2,&quot;^\s*([^,]+),\s*(.+)$&quot;,&quot;$2 $1&quot;)),TRIM(A2))</code></pre>
+<p>&quot;Smith, John&quot; becomes &quot;John Smith&quot;. Names without a comma are only trimmed.</p>
+<h3>Strip titles and suffixes</h3>
+<pre><code>=TRIM(REGEXREPLACE(A2,&quot;(?i)\b(mr|mrs|ms|miss|dr|jr|sr)\b\.?&quot;,&quot;&quot;))</code></pre>
+<p>&quot;Dr. John Smith Jr&quot; becomes &quot;John Smith&quot;. Check your data first: a surname that is also a title word will be removed too.</p>
+<h3>Ignore case, spacing, punctuation and word order</h3>
+<p>This builds a key by removing punctuation, lowercasing, splitting into words and sorting them:</p>
+<pre><code>=IF(A2=&quot;&quot;,&quot;&quot;,TEXTJOIN(&quot; &quot;,TRUE,SORT(TRANSPOSE(SPLIT(LOWER(TRIM(REGEXREPLACE(A2,&quot;[^\w\s]&quot;,&quot;&quot;))),&quot; &quot;)))))</code></pre>
+<p>&quot;Smith, John&quot;, &quot;John Smith&quot; and &quot;JOHN  SMITH&quot; all become &quot;john smith&quot;. Build the same key for your master list in column F, then look up, where G2 holds the key for the messy name:</p>
+<pre><code>=IFERROR(INDEX($E$2:$E$100,MATCH(G2,$F$2:$F$100,0)),&quot;&quot;)</code></pre>
+<p>The first two sample names return 101. &quot;Jon Smith&quot; returns blank, because the spelling differs inside a word. That is what the next steps are for. Removing punctuation turns O'Brien into OBrien, on both sides, so it still matches itself.</p>
+<h2>Step 2: a looser key for &quot;Jon&quot; versus &quot;John&quot;</h2>
+<p>Cleaning cannot fix a spelling difference inside a word. A common compromise is a key of first initial plus last word:</p>
+<pre><code>=IF(A2=&quot;&quot;,&quot;&quot;,LOWER(LEFT(TRIM(A2),1)&amp;&quot; &quot;&amp;REGEXEXTRACT(TRIM(A2),&quot;\S+$&quot;)))</code></pre>
+<p>&quot;Jon Smith&quot;, &quot;John Smith&quot; and &quot;J. Smith&quot; all become &quot;j smith&quot;. The catch is false positives: John Smith and Jane Smith get the same key. Flip &quot;Last, First&quot; names first, otherwise &quot;Smith, John&quot; gives &quot;s john&quot;. Use this key to build a shortlist, then check the pairs by eye.</p>
+<h2>Step 3: score-based matching</h2>
+<p>When the cleaning approaches are not enough, you need a similarity score, a number from 0 to 1 for how close two strings are. Google Sheets has no built-in function for it. You can build one from formulas alone with LAMBDA, as our Levenshtein guide shows: <a href="/levenshtein-distance-google-sheets">Levenshtein Distance in Google Sheets (Formula, No Script)</a> or get that formula ready-made in our free starter template: <a href="https://snakback.gumroad.com/l/levenshtein-starter">snakback.gumroad.com/l/levenshtein-starter</a></p>
+<p>Another free option is a small Apps Script function (Extensions &gt; Apps Script) that scores a pair using Levenshtein distance, the number of single-character edits between two strings:</p>
+<pre><code>function NAMESCORE(a, b) {
+  a = String(a).toLowerCase().trim();
+  b = String(b).toLowerCase().trim();
+  if (!a &amp;&amp; !b) return 1;
+  var m = a.length, n = b.length, prev = [], cur, i, j;
+  for (j = 0; j &lt;= n; j++) prev[j] = j;
+  for (i = 1; i &lt;= m; i++) {
+    cur = [i];
+    for (j = 1; j &lt;= n; j++) {
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1,
+        prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    }
+    prev = cur;
+  }
+  return 1 - prev[n] / Math.max(m, n);
+}</code></pre>
+<p>Then use =NAMESCORE(A4, $D$2). &quot;Jon Smith&quot; against &quot;John Smith&quot; is one edit over 10 characters, so 0.9. This scores one pair at a time. To find the best match in a list you would need a grid of scores, or a longer script that loops over the list.</p>
+<p>Two cautions before you trust a cut-off such as 0.85:</p>
+<ul><li>Short names cross it too easily, because the score divides one edit by the length. &quot;Ann Lee&quot; against &quot;Ann Lea&quot; scores 0.857 and &quot;Jon Smith&quot; against &quot;Jan Smith&quot; scores 0.889, yet both are different people. Make the cut-off stricter for short names, or send anything that scores below 1 to a &quot;check by eye&quot; column instead of accepting it automatically.</li><li>Score the cleaned key from Step 1, not the raw cell. Raw &quot;Smith, John&quot; against &quot;John Smith&quot; scores only 0.09, although the sorted key already shows they are the same name. =NAMESCORE(G4, $F$2) on the key columns gives 1.</li></ul>
+<p>(Thanks to a reader on our Hashnode blog for pointing out both of these.)</p>
+<h2>Limits</h2>
+<p>No method here understands that &quot;Bob&quot; and &quot;Robert&quot; are the same person. For nicknames, keep a small lookup table of nickname and full name and replace first. Names in different scripts or with accents also need preparing first.</p>
+<h2>When an add-on or script pack helps</h2>
+<p>Disclosure: Snakbacks, the publisher of this site, sells a paid script pack and makes two free add-ons for Google Sheets.</p>
+<p>Fuzzy Match Template for Google Sheets (US$9, no add-on install): <a href="https://snakback.gumroad.com/l/fuzzy-formulas">snakback.gumroad.com/l/fuzzy-formulas</a>. It gives you FUZZYSCORE(a, b) for the 0 to 1 score, FUZZYMATCH(values, lookup, [threshold]) to return the closest name from a clean list, and FUZZYLOOKUP to fetch an ID alongside it, each accepting a whole column. You paste the functions in once, or copy a template sheet, so it works where a Workspace admin blocks add-ons, and you own the code. There is a 30-day refund if it does not work for you. If the cleaning steps above fix your data, you do not need it.</p>
+<p>Our free add-on Fuzzy Match is now on the Google Workspace Marketplace: <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Fuzzy Match on the Marketplace</a>. Duplicate Remover is now on the Marketplace too: <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Duplicate Remover on the Marketplace</a>.</p>
+<p>Tip: after installing, open Extensions &gt; Fuzzy Match &gt; How to use once in each new spreadsheet. Until you do, its formulas can show #NAME?.</p>
+<p>Snakbacks publishes the Duplicate Remover and Fuzzy Match add-ons.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<div class="related"><h2 style="font-size:1.2rem;margin-top:0">More lookups and matching guides</h2><ul class="guide-list"><li><a href="/vlookup-na-error-google-sheets">VLOOKUP Returns #N/A in Google Sheets: Causes and Fixes</a></li><li><a href="/vlookup-partial-match-google-sheets">VLOOKUP Partial Match in Google Sheets (Wildcards, Contains)</a></li><li><a href="/xlookup-google-sheets">XLOOKUP in Google Sheets: Syntax, Wildcards and Examples</a></li><li><a href="/index-match-google-sheets">INDEX MATCH in Google Sheets: Syntax, Examples, vs VLOOKUP</a></li></ul><p><a href="/guides">All guides</a></p></div>
+</article></div>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div class="foot-grid">
+<div><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<p class="muted">A small Australian studio making Google Sheets add-ons.</p>
+<p>info@snakbacks.com<br>PO Box 1400, Burpengary D.C. QLD 4505, Australia</p></div>
+<div><h2>Products</h2><ul>
+<li><a href="/fuzzy-match">Fuzzy Match</a></li><li><a href="/duplicate-remover">Duplicate Remover</a></li><li><a href="/pro">Snakbacks Pro</a></li></ul></div>
+<div><h2>Resources</h2><ul>
+<li><a href="/guides">Guides</a></li><li><a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a></li><li><a href="https://snakback.gumroad.com/l/data-cleanup-kit">Data Cleanup Kit</a></li><li><a href="https://snakback.gumroad.com/l/levenshtein-starter">Levenshtein starter (free)</a></li></ul></div>
+<div><h2>Studio</h2><ul>
+<li><a href="/about">About</a></li><li><a href="/takeover">Add-on takeover</a></li><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="mailto:info@snakbacks.com">Contact</a></li></ul></div>
+</div>
+<p class="fine">Google Sheets, Google Workspace and Google Workspace Marketplace are trademarks of Google LLC. Snakbacks is not affiliated with or endorsed by Google. No tracking or analytics on this site.</p>
+</div></footer>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Case-Sensitive and Case-Insensitive Match in Google Sheets | Snakbacks</title>
+<meta name="description" content="Most lookups in Google Sheets ignore capital letters, which is usually helpful and sometimes a problem. If &quot;abc&quot; and &quot;ABC&quot; are different codes, VLOOKUP...">
+<link rel="canonical" href="https://www.snakbacks.com/case-insensitive-match-google-sheets">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1a5fa0">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Snakbacks">
+<meta property="og:title" content="Case-Sensitive and Case-Insensitive Match in Google Sheets | Snakbacks">
+<meta property="og:description" content="Most lookups in Google Sheets ignore capital letters, which is usually helpful and sometimes a problem. If &quot;abc&quot; and &quot;ABC&quot; are different codes, VLOOKUP...">
+<meta property="og:url" content="https://www.snakbacks.com/case-insensitive-match-google-sheets">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Case-Sensitive and Case-Insensitive Match in Google Sheets","author":{"@type":"Organization","name":"Snakbacks"},"publisher":{"@type":"Organization","name":"Snakbacks"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<nav aria-label="Main"><ul class="nav">
+<li><a href="/#products">Products</a></li>
+<li><a href="/guides" aria-current="page">Guides</a></li>
+<li><a href="/pro">Pro</a></li>
+<li><a href="/takeover">Takeover</a></li>
+<li><a href="/about">About</a></li>
+</ul></nav>
+</div></header>
+<main id="main">
+<div class="wrap"><article class="page-head prose">
+<p class="crumbs"><a href="/">Home</a> / <a href="/guides">Guides</a> / <a href="/guides#lookups">Lookups and matching</a></p>
+<h1 style="font-size:clamp(1.8rem,5vw,2.6rem)">Case-Sensitive and Case-Insensitive Match in Google Sheets</h1>
+<p class="ailine">Written with AI assistance; tested in a real Google Sheet.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<p>Most lookups in Google Sheets ignore capital letters, which is usually helpful and sometimes a problem. If &quot;abc&quot; and &quot;ABC&quot; are different codes, VLOOKUP will quietly return the wrong one. This page lists which functions ignore case, which respect it, and the formulas that force either behaviour.</p>
+<h2>Which functions ignore case</h2>
+<p>These treat &quot;abc&quot;, &quot;Abc&quot; and &quot;ABC&quot; as the same:</p>
+<ul><li>VLOOKUP, HLOOKUP and MATCH</li><li>COUNTIF, COUNTIFS, SUMIF, SUMIFS</li><li>The = operator: =&quot;abc&quot;=&quot;ABC&quot; returns TRUE</li><li>SEARCH (but see below for FIND)</li></ul>
+<h2>Which functions respect case</h2>
+<ul><li>EXACT(a, b) returns TRUE only when the text is identical, including case.</li><li>FIND(find, in) is case-sensitive: =FIND(&quot;ab&quot;,&quot;xAbc&quot;) gives #VALUE!, while =FIND(&quot;Ab&quot;,&quot;xAbc&quot;) gives 2. SEARCH does the same job ignoring case: =SEARCH(&quot;ab&quot;,&quot;xAbc&quot;) gives 2.</li><li>REGEXMATCH is case-sensitive by default: =REGEXMATCH(&quot;Abc&quot;,&quot;abc&quot;) is FALSE. Add (?i) at the start of the pattern to ignore case: =REGEXMATCH(&quot;Abc&quot;,&quot;(?i)abc&quot;) is TRUE. It also matches part of a cell, so anchor with ^ and $ for a whole-cell match.</li></ul>
+<h2>The sample data</h2>
+<p>Row 1 holds headers. Master list, D2:E4 (code, price):</p>
+<ul><li>abc, 1</li><li>ABC, 2</li><li>xyz, 3</li></ul>
+<p>Search values in A2:A4: ABC, abc, Abc. Results go in column B.</p>
+<h2>Method 1: the default lookup returns the first match</h2>
+<pre><code>=VLOOKUP(A2,$D$2:$E$4,2,FALSE)</code></pre>
+<p>All three searches return 1, because the lookup ignores case and takes the first row that matches. For ABC, you wanted 2. It does not warn you.</p>
+<h2>Method 2: case-sensitive lookup with INDEX and MATCH</h2>
+<p>Test each list item with EXACT, and ask MATCH for the first TRUE:</p>
+<pre><code>=IFNA(INDEX($E$2:$E$4,MATCH(TRUE,ARRAYFORMULA(EXACT($D$2:$D$4,A2)),0)),&quot;Not found&quot;)</code></pre>
+<p>Fill down. The results are 2, 1 and Not found. &quot;Abc&quot; matches nothing exactly, so it ends up as Not found. The ARRAYFORMULA is needed so EXACT checks the whole list at once. IFNA turns a true no-match into text without hiding other errors.</p>
+<p>FILTER can do the same without ARRAYFORMULA:</p>
+<pre><code>=IFNA(INDEX(FILTER($E$2:$E$4,EXACT($D$2:$D$4,A2)),1),&quot;Not found&quot;)</code></pre>
+<p>It returns the same 2, 1, Not found. INDEX with 1 keeps the first row if several are identical.</p>
+<h2>Method 3: case-sensitive counts</h2>
+<p>COUNTIF ignores case. To count exact-case matches use SUMPRODUCT:</p>
+<pre><code>=COUNTIF($D$2:$D$4,&quot;abc&quot;)
+=SUMPRODUCT(--EXACT($D$2:$D$4,&quot;abc&quot;))</code></pre>
+<p>The first gives 2, the second gives 1.</p>
+<h2>Method 4: case-sensitive duplicates</h2>
+<p>Put the values Apple, apple, Apple, APPLE in A2:A5. A running count that respects case, in B2 filled down:</p>
+<pre><code>=SUMPRODUCT(--EXACT($A$2:A2,A2))</code></pre>
+<p>Results: 1, 1, 2, 1. A value greater than 1 marks a repeat of the exact same text. The case-ignoring version, =COUNTIF($A$2:A2,A2), gives 1, 2, 3, 4. To keep only the first exact-case copy, filter column B to 1, or use =FILTER(A2:A5,B2:B5=1).</p>
+<h2>What about UNIQUE?</h2>
+<p>UNIQUE is the odd one out: it is case-sensitive. With Apple, apple and APPLE in A2:A4:</p>
+<pre><code>=COUNTA(UNIQUE(A2:A4))</code></pre>
+<p>returns 3, because UNIQUE keeps each different capitalisation. COUNTUNIQUE(A2:A4) also returns 3. So a list can look duplicated to COUNTIF (which says Apple appears 3 times) and unique to UNIQUE at the same time. Force the behaviour you want:</p>
+<ul><li>To ignore case: =UNIQUE(LOWER(A2:A4)) returns a single value, apple, in lower case.</li><li>To respect case: UNIQUE already does, or use the Method 4 helper column and keep the rows where it equals 1.</li></ul>
+<p>The same thinking applies to Data &gt; Data cleanup &gt; Remove duplicates. Try it on a copy of three differently capitalised rows before trusting it on real data.</p>
+<h2>Forcing case-insensitive behaviour</h2>
+<ul><li>For FIND, use SEARCH, or wrap both sides: =FIND(LOWER(&quot;ab&quot;),LOWER(A2)).</li><li>For EXACT, wrap both sides: =EXACT(LOWER(A2),LOWER(B2)) returns TRUE for &quot;Abc&quot; and &quot;aBC&quot;.</li><li>For REGEXMATCH, start the pattern with (?i).</li></ul>
+<h2>Common traps</h2>
+<ul><li>Matching &quot;abc&quot; with trailing spaces fails in both modes. Use TRIM first.</li><li>Extra spaces inside a value (&quot;ab  c&quot;) also break matches in both modes, so clean the data before comparing.</li><li>Case-sensitive formulas test every row of the list, so on very large ranges apply them only to the column you need.</li></ul>
+<h2>When an add-on or script pack helps</h2>
+<p>Disclosure: Snakbacks, the publisher of this site, sells a paid script pack and makes two free add-ons for Google Sheets.</p>
+<p>If your mismatches are typos or word order rather than capital letters, the Fuzzy Match Template for Google Sheets (US$9, no add-on install): <a href="https://snakback.gumroad.com/l/fuzzy-formulas">snakback.gumroad.com/l/fuzzy-formulas</a> is built for that, but for case alone the formulas above are all you need.</p>
+<p>Our free add-on Fuzzy Match is now on the Google Workspace Marketplace: <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Fuzzy Match on the Marketplace</a>. Duplicate Remover is now on the Marketplace too: <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Duplicate Remover on the Marketplace</a>.</p>
+<p>Snakbacks publishes the Duplicate Remover and Fuzzy Match add-ons.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<div class="related"><h2 style="font-size:1.2rem;margin-top:0">More lookups and matching guides</h2><ul class="guide-list"><li><a href="/vlookup-na-error-google-sheets">VLOOKUP Returns #N/A in Google Sheets: Causes and Fixes</a></li><li><a href="/vlookup-partial-match-google-sheets">VLOOKUP Partial Match in Google Sheets (Wildcards, Contains)</a></li><li><a href="/xlookup-google-sheets">XLOOKUP in Google Sheets: Syntax, Wildcards and Examples</a></li><li><a href="/index-match-google-sheets">INDEX MATCH in Google Sheets: Syntax, Examples, vs VLOOKUP</a></li></ul><p><a href="/guides">All guides</a></p></div>
+</article></div>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div class="foot-grid">
+<div><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<p class="muted">A small Australian studio making Google Sheets add-ons.</p>
+<p>info@snakbacks.com<br>PO Box 1400, Burpengary D.C. QLD 4505, Australia</p></div>
+<div><h2>Products</h2><ul>
+<li><a href="/fuzzy-match">Fuzzy Match</a></li><li><a href="/duplicate-remover">Duplicate Remover</a></li><li><a href="/pro">Snakbacks Pro</a></li></ul></div>
+<div><h2>Resources</h2><ul>
+<li><a href="/guides">Guides</a></li><li><a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a></li><li><a href="https://snakback.gumroad.com/l/data-cleanup-kit">Data Cleanup Kit</a></li><li><a href="https://snakback.gumroad.com/l/levenshtein-starter">Levenshtein starter (free)</a></li></ul></div>
+<div><h2>Studio</h2><ul>
+<li><a href="/about">About</a></li><li><a href="/takeover">Add-on takeover</a></li><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="mailto:info@snakbacks.com">Contact</a></li></ul></div>
+</div>
+<p class="fine">Google Sheets, Google Workspace and Google Workspace Marketplace are trademarks of Google LLC. Snakbacks is not affiliated with or endorsed by Google. No tracking or analytics on this site.</p>
+</div></footer>
+</body>
+</html>

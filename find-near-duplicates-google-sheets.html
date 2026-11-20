@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Find Near-Duplicates in Google Sheets (Similar, Not Identical) | Snakbacks</title>
+<meta name="description" content="Remove duplicates, UNIQUE and COUNTIF only catch values that are exactly the same. Real lists are full of near-duplicates: &quot;Acme Pty Ltd&quot;, &quot;ACME Pty. Ltd&quot;...">
+<link rel="canonical" href="https://www.snakbacks.com/find-near-duplicates-google-sheets">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1a5fa0">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Snakbacks">
+<meta property="og:title" content="Find Near-Duplicates in Google Sheets (Similar, Not Identical) | Snakbacks">
+<meta property="og:description" content="Remove duplicates, UNIQUE and COUNTIF only catch values that are exactly the same. Real lists are full of near-duplicates: &quot;Acme Pty Ltd&quot;, &quot;ACME Pty. Ltd&quot;...">
+<meta property="og:url" content="https://www.snakbacks.com/find-near-duplicates-google-sheets">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Find Near-Duplicates in Google Sheets (Similar, Not Identical)","author":{"@type":"Organization","name":"Snakbacks"},"publisher":{"@type":"Organization","name":"Snakbacks"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<nav aria-label="Main"><ul class="nav">
+<li><a href="/#products">Products</a></li>
+<li><a href="/guides" aria-current="page">Guides</a></li>
+<li><a href="/pro">Pro</a></li>
+<li><a href="/takeover">Takeover</a></li>
+<li><a href="/about">About</a></li>
+</ul></nav>
+</div></header>
+<main id="main">
+<div class="wrap"><article class="page-head prose">
+<p class="crumbs"><a href="/">Home</a> / <a href="/guides">Guides</a> / <a href="/guides#duplicates">Duplicates</a></p>
+<h1 style="font-size:clamp(1.8rem,5vw,2.6rem)">Find Near-Duplicates in Google Sheets (Similar, Not Identical)</h1>
+<p class="ailine">Written with AI assistance; tested in a real Google Sheet.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<p>Remove duplicates, UNIQUE and COUNTIF only catch values that are exactly the same. Real lists are full of near-duplicates: &quot;Acme Pty Ltd&quot;, &quot;ACME Pty. Ltd&quot; and &quot;Acme Pty Limited&quot; are one customer typed three ways, and &quot;Initec&quot; is probably a typo for &quot;Initech&quot;. This page finds them in two passes: a cleaned key that makes formatting differences disappear, then a similarity score for the typos that are left. Everything is formulas, and your original data stays untouched.</p>
+<h2>The sample data</h2>
+<p>Row 1 holds headers. Names in A2:A8:</p>
+<ul><li>Acme Pty Ltd</li><li>ACME Pty. Ltd</li><li>Globex Corporation</li><li>Initech</li><li>Acme Pty Limited</li><li>Globex Corp</li><li>Initec</li></ul>
+<h2>Pass 1: a cleaned key</h2>
+<p>Most near-duplicates differ only in capitals, punctuation, spacing and company suffixes. Build a key with all of that removed. In B2, filled down:</p>
+<pre><code>=IF(A2=&quot;&quot;,&quot;&quot;,TRIM(REGEXREPLACE(REGEXREPLACE(LOWER(SUBSTITUTE(A2,CHAR(160),&quot; &quot;)),&quot;[^a-z0-9 ]&quot;,&quot;&quot;),&quot;\b(pty|ltd|limited|inc|llc|corp|corporation|co|company|the)\b&quot;,&quot;&quot;)))</code></pre>
+<p>The keys are acme, acme, globex, initech, acme, globex, initec. Reading from the inside: SUBSTITUTE swaps non-breaking spaces for normal ones, LOWER removes capitals, the first REGEXREPLACE deletes everything except letters, digits and spaces, the second deletes the suffix words, and TRIM tidies the spaces left behind. Edit the word list to suit your data, and check that no real name is on it. The key also drops accented letters, so &quot;Café&quot; becomes &quot;caf&quot;; that is fine for matching, as long as both copies lose the same letters.</p>
+<h2>Flag and group the exact key matches</h2>
+<p>Count each key. In C2:</p>
+<pre><code>=COUNTIF($B$2:$B$8,B2)&gt;1</code></pre>
+<p>TRUE marks a near-duplicate: the three Acme rows and the two Globex rows. Initech and Initec show FALSE, because their keys still differ.</p>
+<p>To label each group with the first spelling seen, in D2:</p>
+<pre><code>=INDEX($A$2:$A$8,MATCH(B2,$B$2:$B$8,0))</code></pre>
+<p>This gives Acme Pty Ltd for all three Acme rows, Globex Corporation for both Globex rows, and the name itself for the others. Use column D as the clean value, or as the key for any of our exact methods, such as merging rows and adding up their amounts: <a href="/merge-duplicate-rows-sum-google-sheets">Merge Duplicate Rows and Sum Values in Google Sheets</a></p>
+<h2>Pass 2: catch typos with a similarity score</h2>
+<p>Cleaning cannot fix a misspelling inside a word. For that, score each key against every other key and keep the best score. This uses the LEVENSHTEIN named function from our Levenshtein guide, which takes a minute to set up: <a href="/levenshtein-distance-google-sheets">Levenshtein Distance in Google Sheets (Formula, No Script)</a> (or get it ready-made in our free starter template: <a href="https://snakback.gumroad.com/l/levenshtein-starter">snakback.gumroad.com/l/levenshtein-starter</a>)</p>
+<p>In E2, filled down:</p>
+<pre><code>=IF(B2=&quot;&quot;,&quot;&quot;,MAX(MAP($B$2:$B$8,ARRAYFORMULA(ROW($B$2:$B$8)),LAMBDA(x,rn,IF(OR(rn=ROW(),x=&quot;&quot;),0,1-LEVENSHTEIN(B2,x)/MAX(LEN(B2),LEN(x)))))))</code></pre>
+<p>Results: 1, 1, 1, 0.857, 1, 1, 0.857. A score of 1 means another row has the same key (Pass 1 already found those). Initech and Initec score 0.857 against each other, one letter apart. The rn=ROW() test skips the row's own key, which would always score 1. Keep the ARRAYFORMULA around ROW: without it, ROW of a range returns only the first row number, MAP gets two inputs of different sizes, and the formula returns #VALUE!. We hit exactly that in testing.</p>
+<p>Turn the score into a decision in F2:</p>
+<pre><code>=IF(E2=&quot;&quot;,&quot;&quot;,IF(E2=1,&quot;duplicate&quot;,IF(E2&gt;=0.85,&quot;check&quot;,&quot;&quot;)))</code></pre>
+<p>&quot;check&quot; is the useful column: likely typos, worth a look before you merge them. Do not merge them automatically. One letter is a large share of a short name, so two genuinely different short names can pass 0.85. Raise the cut-off for short keys, or always review &quot;check&quot; rows by eye.</p>
+<h2>Remove the duplicates once you have reviewed them</h2>
+<p>When columns D and F look right, make a copy of the tab and turn column D into fixed values (copy it, then Edit &gt; Paste special &gt; Values only), so deleting rows cannot change the labels. Then either:</p>
+<ul><li>keep the first row of each group with Data &gt; Data cleanup &gt; Remove duplicates, ticking only column D, or</li><li>build a clean list with =UNIQUE(D2:D8), which returns Acme Pty Ltd, Globex Corporation, Initech, Initec.</li></ul>
+<p>Fix any &quot;check&quot; rows by hand first (here, change Initec to Initech) and the list collapses to three.</p>
+<h2>Limits</h2>
+<ul><li>The similarity formula scores every pair, so the work grows with the square of the list. A few hundred rows is comfortable; thousands will be very slow.</li><li>It finds the closest other row but does not group chains of typos: if A is close to B and B is close to C, these formulas will not put all three in one group.</li><li>Reordered words (&quot;Smith John&quot; and &quot;John Smith&quot;) score low. Sort the words inside the key if order does not matter, as shown in our names guide: <a href="/match-names-with-typos-google-sheets">Match Names with Typos in Google Sheets (Fuzzy Name Matching)</a></li></ul>
+<h2>When an add-on or script pack helps</h2>
+<p>Disclosure: Snakbacks, the publisher of this site, sells a paid script pack and makes two free add-ons for Google Sheets.</p>
+<p>The two passes above are free and fine for a few hundred rows. The Data Cleanup Kit for Google Sheets (US$15, no add-on install): <a href="https://snakback.gumroad.com/l/data-cleanup-kit">snakback.gumroad.com/l/data-cleanup-kit</a> does both in one function: FUZZYDUPES(range) groups near-duplicates, chains included, and labels each group, on up to 600 rows at a time. It also has ready-made tabs for merging and summing, keeping the latest row, comparing lists, splitting names and cleaning text.</p>
+<p>Our free add-on Duplicate Remover is on the Google Workspace Marketplace: <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Duplicate Remover on the Marketplace</a>.</p>
+<p>Snakbacks publishes the Duplicate Remover and Fuzzy Match add-ons.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<div class="related"><h2 style="font-size:1.2rem;margin-top:0">More duplicates guides</h2><ul class="guide-list"><li><a href="/remove-duplicates-google-sheets">How to Remove Duplicates in Google Sheets: 5 Ways</a></li><li><a href="/remove-duplicates-google-sheets-multiple-columns">Remove Duplicates in Google Sheets by Multiple Columns</a></li><li><a href="/remove-duplicates-keep-latest-google-sheets">Remove Duplicates and Keep the Latest in Google Sheets</a></li><li><a href="/highlight-duplicates-google-sheets">How to Highlight Duplicates in Google Sheets (Formulas)</a></li></ul><p><a href="/guides">All guides</a></p></div>
+</article></div>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div class="foot-grid">
+<div><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<p class="muted">A small Australian studio making Google Sheets add-ons.</p>
+<p>info@snakbacks.com<br>PO Box 1400, Burpengary D.C. QLD 4505, Australia</p></div>
+<div><h2>Products</h2><ul>
+<li><a href="/fuzzy-match">Fuzzy Match</a></li><li><a href="/duplicate-remover">Duplicate Remover</a></li><li><a href="/pro">Snakbacks Pro</a></li></ul></div>
+<div><h2>Resources</h2><ul>
+<li><a href="/guides">Guides</a></li><li><a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a></li><li><a href="https://snakback.gumroad.com/l/data-cleanup-kit">Data Cleanup Kit</a></li><li><a href="https://snakback.gumroad.com/l/levenshtein-starter">Levenshtein starter (free)</a></li></ul></div>
+<div><h2>Studio</h2><ul>
+<li><a href="/about">About</a></li><li><a href="/takeover">Add-on takeover</a></li><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="mailto:info@snakbacks.com">Contact</a></li></ul></div>
+</div>
+<p class="fine">Google Sheets, Google Workspace and Google Workspace Marketplace are trademarks of Google LLC. Snakbacks is not affiliated with or endorsed by Google. No tracking or analytics on this site.</p>
+</div></footer>
+</body>
+</html>

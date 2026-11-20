@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VLOOKUP Partial Match in Google Sheets (Wildcards, Contains) | Snakbacks</title>
+<meta name="description" content="VLOOKUP normally needs the whole cell to match. If you search for &quot;Acme&quot; and the list says &quot;Acme Pty Ltd&quot;, you get #N/A. To do a partial match,...">
+<link rel="canonical" href="https://www.snakbacks.com/vlookup-partial-match-google-sheets">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1a5fa0">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Snakbacks">
+<meta property="og:title" content="VLOOKUP Partial Match in Google Sheets (Wildcards, Contains) | Snakbacks">
+<meta property="og:description" content="VLOOKUP normally needs the whole cell to match. If you search for &quot;Acme&quot; and the list says &quot;Acme Pty Ltd&quot;, you get #N/A. To do a partial match,...">
+<meta property="og:url" content="https://www.snakbacks.com/vlookup-partial-match-google-sheets">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"VLOOKUP Partial Match in Google Sheets (Wildcards, Contains)","author":{"@type":"Organization","name":"Snakbacks"},"publisher":{"@type":"Organization","name":"Snakbacks"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<nav aria-label="Main"><ul class="nav">
+<li><a href="/#products">Products</a></li>
+<li><a href="/guides" aria-current="page">Guides</a></li>
+<li><a href="/pro">Pro</a></li>
+<li><a href="/takeover">Takeover</a></li>
+<li><a href="/about">About</a></li>
+</ul></nav>
+</div></header>
+<main id="main">
+<div class="wrap"><article class="page-head prose">
+<p class="crumbs"><a href="/">Home</a> / <a href="/guides">Guides</a> / <a href="/guides#lookups">Lookups and matching</a></p>
+<h1 style="font-size:clamp(1.8rem,5vw,2.6rem)">VLOOKUP Partial Match in Google Sheets (Wildcards, Contains)</h1>
+<p class="ailine">Written with AI assistance; tested in a real Google Sheet.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<p>VLOOKUP normally needs the whole cell to match. If you search for &quot;Acme&quot; and the list says &quot;Acme Pty Ltd&quot;, you get #N/A. To do a partial match, &quot;contains&quot;, starts-with or ends-with lookup, you add wildcards. This page shows the formulas, and where partial matching stops working.</p>
+<h2>The sample data</h2>
+<p>Master list, D2:E5 (name, ID):</p>
+<ul><li>Initech, 101</li><li>Umbrella Corp, 102</li><li>Acme Pty Ltd, 103</li><li>Globex Corporation, 104</li></ul>
+<p>Search terms go in column A, starting at A2. Row 1 holds headers.</p>
+<h2>Method 1: VLOOKUP with wildcards (contains)</h2>
+<p>The asterisk * stands for any run of characters. Put one on each side of your search value:</p>
+<pre><code>=IF(A2=&quot;&quot;,&quot;&quot;,IFERROR(VLOOKUP(&quot;*&quot;&amp;A2&amp;&quot;*&quot;,$D$2:$E$100,2,FALSE),&quot;&quot;))</code></pre>
+<p>The last argument must be FALSE (exact match mode). Wildcards only work in that mode. Matching ignores case.</p>
+<p>With A2:A5 = acme, Globex, Wayne, Corp, the results are 103, 104, blank, 102. &quot;Wayne&quot; is not in the list, so IFERROR gives a blank. &quot;Corp&quot; appears in both Umbrella Corp and Globex Corporation, and VLOOKUP returns the first match from the top, so you get 102. It does not warn you that there were two.</p>
+<p>The blank check at the start matters. An empty search cell becomes &quot;**&quot;, which matches every non-empty cell and returns the first row.</p>
+<h2>Method 2: starts with, and ends with</h2>
+<p>Starts with, wildcard on the right only:</p>
+<pre><code>=IF(A2=&quot;&quot;,&quot;&quot;,IFERROR(VLOOKUP(A2&amp;&quot;*&quot;,$D$2:$E$100,2,FALSE),&quot;&quot;))</code></pre>
+<p>Searching Umb, Corp, glo gives 102, blank, 104. &quot;Corp&quot; is blank because no name starts with it.</p>
+<p>Ends with, wildcard on the left only:</p>
+<pre><code>=IF(A2=&quot;&quot;,&quot;&quot;,IFERROR(VLOOKUP(&quot;*&quot;&amp;A2,$D$2:$E$100,2,FALSE),&quot;&quot;))</code></pre>
+<p>Searching Ltd, corp, Corporation gives 103, 102, 104.</p>
+<p>There is also a single-character wildcard, the question mark. &quot;Sm?th&quot; matches Smith and Smyth.</p>
+<h2>Method 3: XLOOKUP with wildcard mode</h2>
+<p>XLOOKUP does the same thing with a clearer layout. The final argument, 2, switches on wildcard matching:</p>
+<pre><code>=IF(A2=&quot;&quot;,&quot;&quot;,XLOOKUP(&quot;*&quot;&amp;A2&amp;&quot;*&quot;,$D$2:$D$100,$E$2:$E$100,&quot;&quot;,2))</code></pre>
+<p>Same results as Method 1. The fourth argument, &quot;&quot;, is what you get when nothing matches, so no IFERROR is needed.</p>
+<h2>Method 4: the reverse case, your cell is the longer text</h2>
+<p>Sometimes the cell holds a long string, such as &quot;Invoice Acme Pty Ltd Sydney&quot;, and the master list holds the short name. Wildcards cannot help here, because the wildcard goes on the lookup value, not on the list. Use SEARCH instead, which tests whether each list item appears inside your text:</p>
+<pre><code>=IF(A2=&quot;&quot;,&quot;&quot;,IFERROR(INDEX(FILTER($E$2:$E$5,ISNUMBER(SEARCH($D$2:$D$5,A2))),1),&quot;&quot;))</code></pre>
+<p>SEARCH returns a position if the list name is found inside A2, and an error if not. ISNUMBER turns that into TRUE or FALSE, FILTER keeps the matching IDs, and INDEX takes the first. Limit the range to your real data (D2:D5, not D2:D100): a blank cell in the list would count as found everywhere.</p>
+<p>On the sample, &quot;Invoice Acme Pty Ltd Sydney&quot; gives 103, &quot;Umbrella Corp refund&quot; gives 102, and &quot;Unknown supplier&quot; gives blank.</p>
+<h2>When the search text contains * or ?</h2>
+<p>If your search value itself has an asterisk or question mark, it is treated as a wildcard. Put a tilde in front of each one to make it literal:</p>
+<pre><code>=IFERROR(VLOOKUP(&quot;*&quot;&amp;REGEXREPLACE(A2,&quot;([*?~])&quot;,&quot;~$1&quot;)&amp;&quot;*&quot;,$D$2:$E$100,2,FALSE),&quot;&quot;)</code></pre>
+<p>Suppose the list has &quot;AxB Ltd&quot; (201) and &quot;A*B Ltd&quot; (202). Searching for A*B without the escape matches AxB Ltd first and returns 201. With the escape it returns 202.</p>
+<h2>Limits of partial matching</h2>
+<ul><li>Wildcards match text cells. A lookup column of true numbers (101, 102) will not match &quot;*10*&quot;. Convert it with a helper column such as =TEXT(D2,&quot;0&quot;).</li><li>Partial matching returns only the first hit, in sheet order. Short search terms like &quot;Corp&quot; give risky results. Sort or lengthen your terms if that matters.</li><li>It cannot handle typos, different word order or abbreviations. &quot;Inytech&quot; does not contain &quot;Initech&quot;, and &quot;Corp Umbrella&quot; does not contain &quot;Umbrella Corp&quot;. Wildcards only handle the case where one string is literally inside the other.</li><li>Extra spaces and punctuation break matches. Run Data &gt; Data cleanup &gt; Trim whitespace first.</li></ul>
+<h2>When an add-on or script pack helps</h2>
+<p>Disclosure: Snakbacks, the publisher of this site, sells a paid script pack and makes two free add-ons for Google Sheets.</p>
+<p>If your problem is typos, word order or punctuation rather than &quot;one string inside another&quot;, the formulas above will not find the match. Fuzzy Match Template for Google Sheets (US$9, no add-on install): <a href="https://snakback.gumroad.com/l/fuzzy-formulas">snakback.gumroad.com/l/fuzzy-formulas</a>. It adds FUZZYLOOKUP(values, lookup, return_range, [threshold]), a fuzzy XLOOKUP, and FUZZYMATCH and FUZZYSCORE. You paste the functions into your sheet once, or copy a template sheet, so it works where a Workspace admin blocks add-ons. You own the code and it runs only inside your sheet. There is a 30-day refund if it does not work for you. For a one-off lookup with clean data, the free wildcard formulas above are enough and you do not need to buy anything.</p>
+<p>Our free add-on Fuzzy Match is now on the Google Workspace Marketplace: <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Fuzzy Match on the Marketplace</a>. Duplicate Remover is now on the Marketplace too: <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Duplicate Remover on the Marketplace</a>.</p>
+<p>Tip: after installing, open Extensions &gt; Fuzzy Match &gt; How to use once in each new spreadsheet. Until you do, its formulas can show #NAME?.</p>
+<p>Snakbacks publishes the Duplicate Remover and Fuzzy Match add-ons.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<div class="related"><h2 style="font-size:1.2rem;margin-top:0">More lookups and matching guides</h2><ul class="guide-list"><li><a href="/vlookup-na-error-google-sheets">VLOOKUP Returns #N/A in Google Sheets: Causes and Fixes</a></li><li><a href="/xlookup-google-sheets">XLOOKUP in Google Sheets: Syntax, Wildcards and Examples</a></li><li><a href="/index-match-google-sheets">INDEX MATCH in Google Sheets: Syntax, Examples, vs VLOOKUP</a></li><li><a href="/case-insensitive-match-google-sheets">Case-Sensitive and Case-Insensitive Match in Google Sheets</a></li></ul><p><a href="/guides">All guides</a></p></div>
+</article></div>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div class="foot-grid">
+<div><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<p class="muted">A small Australian studio making Google Sheets add-ons.</p>
+<p>info@snakbacks.com<br>PO Box 1400, Burpengary D.C. QLD 4505, Australia</p></div>
+<div><h2>Products</h2><ul>
+<li><a href="/fuzzy-match">Fuzzy Match</a></li><li><a href="/duplicate-remover">Duplicate Remover</a></li><li><a href="/pro">Snakbacks Pro</a></li></ul></div>
+<div><h2>Resources</h2><ul>
+<li><a href="/guides">Guides</a></li><li><a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a></li><li><a href="https://snakback.gumroad.com/l/data-cleanup-kit">Data Cleanup Kit</a></li><li><a href="https://snakback.gumroad.com/l/levenshtein-starter">Levenshtein starter (free)</a></li></ul></div>
+<div><h2>Studio</h2><ul>
+<li><a href="/about">About</a></li><li><a href="/takeover">Add-on takeover</a></li><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="mailto:info@snakbacks.com">Contact</a></li></ul></div>
+</div>
+<p class="fine">Google Sheets, Google Workspace and Google Workspace Marketplace are trademarks of Google LLC. Snakbacks is not affiliated with or endorsed by Google. No tracking or analytics on this site.</p>
+</div></footer>
+</body>
+</html>

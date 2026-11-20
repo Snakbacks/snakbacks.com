@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TRIM Not Working in Google Sheets? Remove Hidden Spaces | Snakbacks</title>
+<meta name="description" content="TRIM is the first thing people reach for to remove extra spaces, and it quietly fails on some of the most common culprits. This page covers what TRIM...">
+<link rel="canonical" href="https://www.snakbacks.com/trim-not-working-google-sheets">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1a5fa0">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Snakbacks">
+<meta property="og:title" content="TRIM Not Working in Google Sheets? Remove Hidden Spaces | Snakbacks">
+<meta property="og:description" content="TRIM is the first thing people reach for to remove extra spaces, and it quietly fails on some of the most common culprits. This page covers what TRIM...">
+<meta property="og:url" content="https://www.snakbacks.com/trim-not-working-google-sheets">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"TRIM Not Working in Google Sheets? Remove Hidden Spaces","author":{"@type":"Organization","name":"Snakbacks"},"publisher":{"@type":"Organization","name":"Snakbacks"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<nav aria-label="Main"><ul class="nav">
+<li><a href="/#products">Products</a></li>
+<li><a href="/guides" aria-current="page">Guides</a></li>
+<li><a href="/pro">Pro</a></li>
+<li><a href="/takeover">Takeover</a></li>
+<li><a href="/about">About</a></li>
+</ul></nav>
+</div></header>
+<main id="main">
+<div class="wrap"><article class="page-head prose">
+<p class="crumbs"><a href="/">Home</a> / <a href="/guides">Guides</a> / <a href="/guides#cleanup">Text cleanup</a></p>
+<h1 style="font-size:clamp(1.8rem,5vw,2.6rem)">TRIM Not Working in Google Sheets? Remove Hidden Spaces</h1>
+<p class="ailine">Written with AI assistance; tested in a real Google Sheet.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<p>TRIM is the first thing people reach for to remove extra spaces, and it quietly fails on some of the most common culprits. This page covers what TRIM does, the invisible characters it misses (non-breaking spaces, line breaks, tabs), how to find out which one you have, and formula fixes for each, including a whole column at once.</p>
+<h2>The sample data</h2>
+<p>Row 1 holds headers. Build the test inputs with formulas so you can see the problem:</p>
+<ul><li>A2: <code>=&quot;  John   Smith  &quot;</code> (leading, trailing and doubled spaces)</li><li>A3: <code>=&quot;John&quot;&amp;CHAR(160)&amp;&quot;Smith&quot;</code> (a non-breaking space)</li><li>A4: <code>=&quot;John&quot;&amp;CHAR(10)&amp;&quot;Smith&quot;</code> (a line break)</li><li>A5: <code>=&quot;John&quot;&amp;CHAR(9)&amp;&quot;Smith&quot;</code> (a tab)</li></ul>
+<h2>What TRIM does</h2>
+<pre><code>=TRIM(A2)</code></pre>
+<p>This returns John Smith. TRIM removes leading and trailing spaces and collapses runs of spaces between words into one. It only touches the normal space character, code 32.</p>
+<h2>Non-breaking spaces (CHAR 160)</h2>
+<p>Text pasted from web pages, PDFs and some exports contains non-breaking spaces. They look identical to spaces but are a different character, so TRIM leaves them alone. On A3, =TRIM(A3) still returns John and Smith joined by the odd space. Swap them for normal spaces first, then TRIM:</p>
+<pre><code>=TRIM(SUBSTITUTE(A3,CHAR(160),&quot; &quot;))</code></pre>
+<p>This returns John Smith with a normal space.</p>
+<h2>Line breaks and tabs</h2>
+<p>A line break is CHAR(10) and a tab is CHAR(9). CLEAN strips non-printing characters, which includes both, but it deletes them rather than replacing them with a space, so &quot;John&quot; and &quot;Smith&quot; would run together as JohnSmith. If you want a space in their place, use SUBSTITUTE:</p>
+<pre><code>=TRIM(SUBSTITUTE(SUBSTITUTE(A4,CHAR(10),&quot; &quot;),CHAR(9),&quot; &quot;))</code></pre>
+<p>If you just want them gone, =CLEAN(A4) does it. You can combine everything:</p>
+<pre><code>=TRIM(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(A2,CHAR(160),&quot; &quot;),CHAR(10),&quot; &quot;),CHAR(9),&quot; &quot;))</code></pre>
+<h2>One formula with REGEXREPLACE</h2>
+<p>REGEXREPLACE can replace any run of whitespace with a single space. In regular expressions, \s matches spaces, tabs and line breaks, but not the non-breaking space, so add it explicitly:</p>
+<pre><code>=TRIM(REGEXREPLACE(A2,&quot;[\s\x{00A0}]+&quot;,&quot; &quot;))</code></pre>
+<p>This handles all four sample cells and returns John Smith each time (after TRIM removes the end spaces).</p>
+<h2>The menu option</h2>
+<p>Select the range, then choose Data &gt; Data cleanup &gt; Trim whitespace. It edits the cells in place, so work on a copy of the tab first. If your data has non-breaking spaces, test it on a few rows to check it catches them before you rely on it. The formulas above leave the original untouched.</p>
+<h2>How to find the hidden character</h2>
+<p>First, compare lengths:</p>
+<pre><code>=LEN(A3)-LEN(TRIM(A3))</code></pre>
+<p>If this is above 0, TRIM found ordinary spaces to remove. If a cell looks messy but this gives 0, the problem is not a normal space.</p>
+<p>Then inspect the characters one at a time. To see the code of the fifth character:</p>
+<pre><code>=CODE(MID(A3,5,1))</code></pre>
+<p>For A3, this returns 160. 32 is a normal space, 10 a line break, 9 a tab. To list every character code in a cell at once:</p>
+<pre><code>=ARRAYFORMULA(CODE(MID(A3,SEQUENCE(LEN(A3)),1)))</code></pre>
+<p>This returns a column of codes, and the odd one out is your culprit.</p>
+<h2>Clean a whole column</h2>
+<p>Put one formula in B2 instead of filling down:</p>
+<pre><code>=ARRAYFORMULA(IF(A2:A=&quot;&quot;,&quot;&quot;,TRIM(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(A2:A,CHAR(160),&quot; &quot;),CHAR(10),&quot; &quot;),CHAR(9),&quot; &quot;))))</code></pre>
+<p>The IF keeps empty rows empty. If you want to replace the original values, copy column B and use Edit &gt; Paste special &gt; Values only over column A, then delete B.</p>
+<h2>Why this breaks lookups</h2>
+<p>Two values that look the same but differ by an extra invisible character are different to Sheets. That is the most common reason a VLOOKUP, MATCH or COUNTIF reports #N/A or a count of zero for a value you can see. Clean both the search value and the list, then look up again. The full set of causes is at <a href="/vlookup-na-error-google-sheets">VLOOKUP Returns #N/A in Google Sheets: Causes and Fixes</a></p>
+<p>One surprise from testing: when comparing, Sheets treats a non-breaking space like an ordinary space. &quot;John&quot; + CHAR(160) + &quot;Smith&quot; does match &quot;John Smith&quot; in VLOOKUP and in a plain = comparison, even though TRIM leaves the character in place. It breaks a lookup when it is an extra space, for example a trailing one: &quot;Initech&quot; + CHAR(160) will not match &quot;Initech&quot;, and TRIM will not fix it. So do not use =A2=&quot;John Smith&quot; to prove a cell is clean; check LEN or CODE as shown above.</p>
+<h2>When something is not a space at all</h2>
+<p>Other invisible characters exist, such as zero-width spaces (code 8203). CODE shows them, and you can remove one with SUBSTITUTE(A2,CHAR(8203),&quot;&quot;). If the code you find is not one of the above, search for that code number and substitute it the same way.</p>
+<h2>When an add-on or script pack helps</h2>
+<p>Disclosure: Snakbacks, the publisher of this site, sells a paid script pack and makes two free add-ons for Google Sheets.</p>
+<p>Everything above works with formulas alone. If you clean data like this often, the Data Cleanup Kit for Google Sheets (US$15, no add-on install): <a href="https://snakback.gumroad.com/l/data-cleanup-kit">snakback.gumroad.com/l/data-cleanup-kit</a> includes a ready-made clean-text tab that trims including non-breaking spaces and builds a match key, so you paste data in and read clean values out.</p>
+<p>Our free add-on Fuzzy Match is now on the Google Workspace Marketplace: <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Fuzzy Match on the Marketplace</a>. Duplicate Remover is now on the Marketplace too: <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Duplicate Remover on the Marketplace</a>.</p>
+<p>Snakbacks publishes the Duplicate Remover and Fuzzy Match add-ons.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<div class="related"><h2 style="font-size:1.2rem;margin-top:0">More text cleanup guides</h2><ul class="guide-list"><li><a href="/split-full-name-google-sheets">Split First and Last Name in Google Sheets: 4 Methods</a></li><li><a href="/standardize-company-names-google-sheets">Standardize Company Names in Google Sheets (Clean Key + Mapping Table)</a></li></ul><p><a href="/guides">All guides</a></p></div>
+</article></div>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div class="foot-grid">
+<div><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<p class="muted">A small Australian studio making Google Sheets add-ons.</p>
+<p>info@snakbacks.com<br>PO Box 1400, Burpengary D.C. QLD 4505, Australia</p></div>
+<div><h2>Products</h2><ul>
+<li><a href="/fuzzy-match">Fuzzy Match</a></li><li><a href="/duplicate-remover">Duplicate Remover</a></li><li><a href="/pro">Snakbacks Pro</a></li></ul></div>
+<div><h2>Resources</h2><ul>
+<li><a href="/guides">Guides</a></li><li><a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a></li><li><a href="https://snakback.gumroad.com/l/data-cleanup-kit">Data Cleanup Kit</a></li><li><a href="https://snakback.gumroad.com/l/levenshtein-starter">Levenshtein starter (free)</a></li></ul></div>
+<div><h2>Studio</h2><ul>
+<li><a href="/about">About</a></li><li><a href="/takeover">Add-on takeover</a></li><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="mailto:info@snakbacks.com">Contact</a></li></ul></div>
+</div>
+<p class="fine">Google Sheets, Google Workspace and Google Workspace Marketplace are trademarks of Google LLC. Snakbacks is not affiliated with or endorsed by Google. No tracking or analytics on this site.</p>
+</div></footer>
+</body>
+</html>

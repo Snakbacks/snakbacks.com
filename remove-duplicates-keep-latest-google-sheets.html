@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Remove Duplicates and Keep the Latest in Google Sheets | Snakbacks</title>
+<meta name="description" content="Data &gt; Data cleanup &gt; Remove duplicates keeps the first row it finds and deletes the rest. If your newest record is lower down, that deletes the wrong...">
+<link rel="canonical" href="https://www.snakbacks.com/remove-duplicates-keep-latest-google-sheets">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1a5fa0">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Snakbacks">
+<meta property="og:title" content="Remove Duplicates and Keep the Latest in Google Sheets | Snakbacks">
+<meta property="og:description" content="Data &gt; Data cleanup &gt; Remove duplicates keeps the first row it finds and deletes the rest. If your newest record is lower down, that deletes the wrong...">
+<meta property="og:url" content="https://www.snakbacks.com/remove-duplicates-keep-latest-google-sheets">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Remove Duplicates and Keep the Latest in Google Sheets","author":{"@type":"Organization","name":"Snakbacks"},"publisher":{"@type":"Organization","name":"Snakbacks"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<nav aria-label="Main"><ul class="nav">
+<li><a href="/#products">Products</a></li>
+<li><a href="/guides" aria-current="page">Guides</a></li>
+<li><a href="/pro">Pro</a></li>
+<li><a href="/takeover">Takeover</a></li>
+<li><a href="/about">About</a></li>
+</ul></nav>
+</div></header>
+<main id="main">
+<div class="wrap"><article class="page-head prose">
+<p class="crumbs"><a href="/">Home</a> / <a href="/guides">Guides</a> / <a href="/guides#duplicates">Duplicates</a></p>
+<h1 style="font-size:clamp(1.8rem,5vw,2.6rem)">Remove Duplicates and Keep the Latest in Google Sheets</h1>
+<p class="ailine">Written with AI assistance; tested in a real Google Sheet.</p>
+<aside class="callout dedupe" aria-label="Free add-on"><img src="/assets/dedupe-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Duplicate Remover</span> <span class="tag">Free add-on</span></p>
+<p>Highlight duplicate rows, add a "Duplicate?" column, or copy the repeats to a new sheet, from the Extensions menu. No sidebar and no formulas to write.</p>
+<p><a href="/duplicate-remover">About Duplicate Remover</a> &middot; <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Get it on the Marketplace</a></p></div></aside>
+<p>Data &gt; Data cleanup &gt; Remove duplicates keeps the first row it finds and deletes the rest. If your newest record is lower down, that deletes the wrong one. This page shows how to keep the row with the latest date, or the last occurrence, for each key. The formulas leave your original data untouched.</p>
+<h2>The sample data</h2>
+<p>Row 1 holds headers. A2:C6 (Key, Date, Note):</p>
+<ul><li>A101, 2026-01-05, first</li><li>B202, 2026-02-10, only</li><li>A101, 2026-03-15, newest</li><li>C303, 2026-01-20, solo</li><li>A101, 2026-02-01, middle</li></ul>
+<p>The dates are real dates, not text. Wanted result: one row for each key, with the most recent date.</p>
+<h2>Method 1: sort by date, then look up each key</h2>
+<p>Sort the data newest first, then ask for each unique key. A lookup returns the first row it finds, which after sorting is the newest:</p>
+<pre><code>=ARRAYFORMULA(VLOOKUP(UNIQUE(A2:A6),SORT(A2:C6,2,FALSE),{1,2,3},FALSE))</code></pre>
+<p>Result, three rows: A101, 2026-03-15, newest; B202, 2026-02-10, only; C303, 2026-01-20, solo. SORT(A2:C6,2,FALSE) sorts by column 2 (Date) from newest to oldest. UNIQUE lists each key once. VLOOKUP with {1,2,3} fetches all three columns. Format the Date column as a date if you see a number such as 46096.</p>
+<p>To keep the last occurrence by position instead of by date (the lowest row wins), add the row number as a fourth column and sort on that:</p>
+<pre><code>=ARRAYFORMULA(VLOOKUP(UNIQUE(A2:A6),SORT({A2:C6,ROW(A2:A6)},4,FALSE),{1,2,3},FALSE))</code></pre>
+<p>Result: A101, 2026-02-01, middle; B202, 2026-02-10, only; C303, 2026-01-20, solo. A101 now shows the row that appears last in the sheet, not the newest date. This method always returns one row per key, even if two rows share a date.</p>
+<h2>Method 2: QUERY for the latest date per key</h2>
+<p>QUERY can group by key and take the maximum date. With the header included, in E1:</p>
+<pre><code>=QUERY(A1:B6,&quot;select A, max(B) where A is not null group by A label max(B) 'Latest'&quot;,1)</code></pre>
+<p>Result: Key, Latest, then A101 2026-03-15, B202 2026-02-10, C303 2026-01-20. This gives only the key and the date. Do not add max(C) to get the note: the maximum of a text column is not the note on the latest row.</p>
+<p>To bring the note back, put this in G2 (E2 holds the key and F2 the latest date, so adjust if your QUERY sits elsewhere) and fill down:</p>
+<pre><code>=INDEX(FILTER($C$2:$C$6,$A$2:$A$6=E2,$B$2:$B$6=F2),1)</code></pre>
+<p>Result: newest, only, solo. INDEX with 1 keeps the first row if two share the latest date.</p>
+<h2>Method 3: FILTER with COUNTIFS</h2>
+<p>This keeps whole rows, every column, and removes the older copies:</p>
+<pre><code>=FILTER(A2:C6,COUNTIFS(A2:A6,A2:A6,B2:B6,&quot;&gt;&quot;&amp;B2:B6)=0)</code></pre>
+<p>For each row, COUNTIFS counts the rows with the same key and a later date. FILTER keeps the rows where that count is zero, which means nothing newer exists for that key. Result, in sheet order: B202, 2026-02-10, only; A101, 2026-03-15, newest; C303, 2026-01-20, solo. Wrap it in SORT(...,1,TRUE) to order by key.</p>
+<p>A tempting shortcut, FILTER with MAXIFS(B2:B6,A2:A6,A2:A6), does not work: MAXIFS returns a single value there, not one per row, so you only get one row back.</p>
+<p>A shorter alternative is SORTN, which sorts newest first and then keeps the first row for each key:</p>
+<pre><code>=SORTN(SORT(A2:C6,2,FALSE),9^9,2,1,TRUE)</code></pre>
+<p>Result: A101, 2026-03-15, newest; B202, 2026-02-10, only; C303, 2026-01-20, solo.</p>
+<p>If two rows for one key share the latest date, both are kept. Use Method 1 if you need exactly one.</p>
+<h3>A helper column version</h3>
+<p>In D2, fill down:</p>
+<pre><code>=B2=MAXIFS($B$2:$B$100,$A$2:$A$100,A2)</code></pre>
+<p>D2:D6 gives FALSE, TRUE, TRUE, TRUE, FALSE. TRUE marks the latest row for each key. Filter the column on TRUE, or use it in a FILTER, and the original data stays editable.</p>
+<h2>Method 4: no formula, sort then remove</h2>
+<p>For a one-off clean-up of the real data, not a copy:</p>
+<ol><li>Select the data, then Data &gt; Sort range &gt; Advanced range sorting options. Tick &quot;Data has header row&quot;, sort by Date, Z to A.</li><li>Data &gt; Data cleanup &gt; Remove duplicates. Tick &quot;Data has header row&quot;, and untick every column except Key.</li><li>Click Remove duplicates. Sheets keeps the first row for each key, which is now the newest.</li></ol>
+<p>This deletes rows, so work on a copy of the tab. Undo with Ctrl+Z straight away if it went wrong.</p>
+<h2>Why the wrong row survives</h2>
+<ul><li>Dates stored as text. &quot;2026-03-15&quot; typed as text sorts as text and MAXIFS ignores it. Check that the cells right-align by default, then convert them with Format &gt; Number &gt; Date.</li><li>Trailing spaces in keys. &quot;A101&quot; and &quot;A101 &quot; are different keys. Use Data &gt; Data cleanup &gt; Trim whitespace first.</li><li>Case. Some of these functions ignore case and some do not, so make keys consistent first (for example all upper case with UPPER).</li><li>Range too short. UNIQUE over a longer range such as A2:A100 returns an empty entry for blank rows, so keep the range to your real data.</li><li>Ties. Two rows with the same key and the same latest date: see the notes under Methods 1 and 3.</li></ul>
+<h2>When an add-on or script pack helps</h2>
+<p>Disclosure: Snakbacks, the publisher of this site, sells a paid script pack and makes two free add-ons for Google Sheets.</p>
+<p>Every method above treats a key as exact. If your &quot;duplicates&quot; are the same customer typed differently, such as &quot;Jon Smith&quot; and &quot;John Smith&quot;, none of them will group the rows, and you would keep both. Fuzzy Match Template for Google Sheets (US$9, no add-on install): <a href="https://snakback.gumroad.com/l/fuzzy-formulas">snakback.gumroad.com/l/fuzzy-formulas</a>. Its FUZZYSCORE(a, b) returns a similarity from 0 to 1, so you can build a cleaned key in a helper column and run the formulas above on that. You paste the functions into your sheet once, so it works where a Workspace admin blocks add-ons. There is a 30-day refund if it does not work for you. For clean keys, the free formulas on this page are all you need.</p>
+<p>Duplicate Remover for Google Sheets™, our free add-on, is on the Google Workspace Marketplace: <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Duplicate Remover on the Marketplace</a>.</p>
+<p>Need to catch near-duplicates that exact formulas miss, such as &quot;Acme Pty Ltd&quot; and &quot;ACME Pty. Ltd&quot;? The Data Cleanup Kit for Google Sheets (US$15, no add-on install) groups them for you with FUZZYDUPES, and adds ready-made tabs for merging and summing, keeping the latest row, comparing lists, splitting names and cleaning text: <a href="https://snakback.gumroad.com/l/data-cleanup-kit">snakback.gumroad.com/l/data-cleanup-kit</a></p>
+<p>Snakbacks publishes the Duplicate Remover and Fuzzy Match add-ons.</p>
+<aside class="callout dedupe" aria-label="Free add-on"><img src="/assets/dedupe-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Duplicate Remover</span> <span class="tag">Free add-on</span></p>
+<p>Highlight duplicate rows, add a "Duplicate?" column, or copy the repeats to a new sheet, from the Extensions menu. No sidebar and no formulas to write.</p>
+<p><a href="/duplicate-remover">About Duplicate Remover</a> &middot; <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Get it on the Marketplace</a></p></div></aside>
+<div class="related"><h2 style="font-size:1.2rem;margin-top:0">More duplicates guides</h2><ul class="guide-list"><li><a href="/remove-duplicates-google-sheets">How to Remove Duplicates in Google Sheets: 5 Ways</a></li><li><a href="/remove-duplicates-google-sheets-multiple-columns">Remove Duplicates in Google Sheets by Multiple Columns</a></li><li><a href="/highlight-duplicates-google-sheets">How to Highlight Duplicates in Google Sheets (Formulas)</a></li><li><a href="/count-duplicates-google-sheets">How to Count Duplicates in Google Sheets (COUNTIF, QUERY)</a></li></ul><p><a href="/guides">All guides</a></p></div>
+</article></div>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div class="foot-grid">
+<div><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<p class="muted">A small Australian studio making Google Sheets add-ons.</p>
+<p>info@snakbacks.com<br>PO Box 1400, Burpengary D.C. QLD 4505, Australia</p></div>
+<div><h2>Products</h2><ul>
+<li><a href="/fuzzy-match">Fuzzy Match</a></li><li><a href="/duplicate-remover">Duplicate Remover</a></li><li><a href="/pro">Snakbacks Pro</a></li></ul></div>
+<div><h2>Resources</h2><ul>
+<li><a href="/guides">Guides</a></li><li><a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a></li><li><a href="https://snakback.gumroad.com/l/data-cleanup-kit">Data Cleanup Kit</a></li><li><a href="https://snakback.gumroad.com/l/levenshtein-starter">Levenshtein starter (free)</a></li></ul></div>
+<div><h2>Studio</h2><ul>
+<li><a href="/about">About</a></li><li><a href="/takeover">Add-on takeover</a></li><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="mailto:info@snakbacks.com">Contact</a></li></ul></div>
+</div>
+<p class="fine">Google Sheets, Google Workspace and Google Workspace Marketplace are trademarks of Google LLC. Snakbacks is not affiliated with or endorsed by Google. No tracking or analytics on this site.</p>
+</div></footer>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How to Highlight Duplicates in Google Sheets (Formulas) | Snakbacks</title>
+<meta name="description" content="Highlighting duplicates in Google Sheets uses conditional formatting with a custom formula. The built-in colour rules cannot find repeats on their own,...">
+<link rel="canonical" href="https://www.snakbacks.com/highlight-duplicates-google-sheets">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1a5fa0">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Snakbacks">
+<meta property="og:title" content="How to Highlight Duplicates in Google Sheets (Formulas) | Snakbacks">
+<meta property="og:description" content="Highlighting duplicates in Google Sheets uses conditional formatting with a custom formula. The built-in colour rules cannot find repeats on their own,...">
+<meta property="og:url" content="https://www.snakbacks.com/highlight-duplicates-google-sheets">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"How to Highlight Duplicates in Google Sheets (Formulas)","author":{"@type":"Organization","name":"Snakbacks"},"publisher":{"@type":"Organization","name":"Snakbacks"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<nav aria-label="Main"><ul class="nav">
+<li><a href="/#products">Products</a></li>
+<li><a href="/guides" aria-current="page">Guides</a></li>
+<li><a href="/pro">Pro</a></li>
+<li><a href="/takeover">Takeover</a></li>
+<li><a href="/about">About</a></li>
+</ul></nav>
+</div></header>
+<main id="main">
+<div class="wrap"><article class="page-head prose">
+<p class="crumbs"><a href="/">Home</a> / <a href="/guides">Guides</a> / <a href="/guides#duplicates">Duplicates</a></p>
+<h1 style="font-size:clamp(1.8rem,5vw,2.6rem)">How to Highlight Duplicates in Google Sheets (Formulas)</h1>
+<p class="ailine">Written with AI assistance; tested in a real Google Sheet.</p>
+<aside class="callout dedupe" aria-label="Free add-on"><img src="/assets/dedupe-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Duplicate Remover</span> <span class="tag">Free add-on</span></p>
+<p>Highlight duplicate rows, add a "Duplicate?" column, or copy the repeats to a new sheet, from the Extensions menu. No sidebar and no formulas to write.</p>
+<p><a href="/duplicate-remover">About Duplicate Remover</a> &middot; <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Get it on the Marketplace</a></p></div></aside>
+<p>Highlighting duplicates in Google Sheets uses conditional formatting with a custom formula. The built-in colour rules cannot find repeats on their own, but one short COUNTIF formula can. This page covers one column, several columns, two sheets, and how to remove the highlight again.</p>
+<h2>How to set a rule up</h2>
+<ol><li>Select the range, for example A2:A100.</li><li>Open Format &gt; Conditional formatting.</li><li>Under &quot;Format rules&quot;, choose &quot;Custom formula is&quot;.</li><li>Paste a formula from below and pick a fill colour. Click Done.</li></ol>
+<p>The formula is written for the first cell of your selection (A2). Sheets adjusts it for every other cell.</p>
+<h2>One column</h2>
+<p>Sample data in A2:A7: Apple, Banana, apple, Cherry, Banana, Date.</p>
+<p>Highlight every copy, including the first:</p>
+<pre><code>=AND($A2&lt;&gt;&quot;&quot;,COUNTIF($A$2:$A$100,$A2)&gt;1)</code></pre>
+<p>Apple, Banana, apple and Banana are highlighted (A2, A3, A4, A6). COUNTIF ignores case, so &quot;apple&quot; counts as a repeat of &quot;Apple&quot;.</p>
+<p>Highlight only the repeats and leave the first occurrence alone:</p>
+<pre><code>=AND($A2&lt;&gt;&quot;&quot;,COUNTIF($A$2:$A2,$A2)&gt;1)</code></pre>
+<p>Only A4 and A6 are highlighted. The range grows as it goes down, so each cell counts only what is above it and itself.</p>
+<p>If case matters, so &quot;Apple&quot; and &quot;apple&quot; are different, use EXACT:</p>
+<pre><code>=AND($A2&lt;&gt;&quot;&quot;,SUMPRODUCT(--EXACT($A$2:$A$100,$A2))&gt;1)</code></pre>
+<p>Now only the two Banana cells (A3 and A6) are highlighted.</p>
+<h2>Several columns</h2>
+<p>There are two different questions here.</p>
+<h3>Any repeated value anywhere in a block</h3>
+<p>Select the whole block, for example A2:B4, and use a formula with no dollar signs on the first cell:</p>
+<pre><code>=AND(A2&lt;&gt;&quot;&quot;,COUNTIF($A$2:$B$100,A2)&gt;1)</code></pre>
+<p>Sample, row by row: Apple and Fig; Banana and apple; Fig and Date. Highlighted cells: A2 (Apple), B2 (Fig), B3 (apple), A4 (Fig). Banana and Date are unique.</p>
+<h3>Duplicate rows (the same combination across columns)</h3>
+<p>To flag a row only when several columns all match another row, use COUNTIFS. Select A2:B100:</p>
+<pre><code>=AND($A2&lt;&gt;&quot;&quot;,COUNTIFS($A$2:$A$100,$A2,$B$2:$B$100,$B2)&gt;1)</code></pre>
+<p>Sample rows 2 to 5: Priya and Sydney; Tom and Perth; Priya and Sydney; Priya and Melbourne. Rows 2 and 4 are highlighted. Row 5 is not, because the city differs. Add more column pairs to the COUNTIFS for more columns.</p>
+<h2>Across two sheets</h2>
+<p>Conditional formatting rules cannot point at another sheet directly. The usual workaround is INDIRECT, which turns text into a reference:</p>
+<pre><code>=COUNTIF(INDIRECT(&quot;Sheet2!$A$2:$A$100&quot;),$A2)&gt;0</code></pre>
+<p>Apply it to A2:A100 on Sheet1. Say Sheet1 has Apple, Banana, Cherry, Date in A2:A5 and Sheet2 has banana, Fig, Date in A2:A4. Banana and Date are highlighted. If the sheet name has spaces, wrap it in single quotes inside the double quotes: INDIRECT(&quot;'Old List'!$A$2:$A$100&quot;).</p>
+<p>If that is awkward, use a helper column instead. In B2 on Sheet1, type =COUNTIF(Sheet2!$A$2:$A$100,A2)&gt;0 and fill down, then base your rule on column B.</p>
+<h2>Remove the highlight</h2>
+<ul><li>Conditional formatting: select the range, open Format &gt; Conditional formatting, hover over the rule and click the bin icon. The values stay put and only the colour goes.</li><li>A manual fill colour: select the cells and choose Fill colour &gt; Reset.</li><li>Highlights from a rule come back whenever the rule matches. Deleting the data does not delete the rule, so remove the rule too if you are reusing the sheet.</li></ul>
+<h2>Why a highlight is missing</h2>
+<ul><li>Extra spaces. &quot;Date &quot; and &quot;Date&quot; are not equal. Use Data &gt; Data cleanup &gt; Trim whitespace first.</li><li>Numbers stored as text. A &quot;1001&quot; typed as text will not match the number 1001.</li><li>Range too short. If your data goes past row 100, widen both the &quot;Apply to range&quot; box and the formula.</li><li>Spelling differences. &quot;Jon Smith&quot; and &quot;John Smith&quot; are different strings, so no formula here flags them.</li></ul>
+<h2>When an add-on or script pack helps</h2>
+<p>Disclosure: Snakbacks, the publisher of this site, sells a paid script pack and makes two free add-ons for Google Sheets.</p>
+<p>Conditional formatting colours exact repeats. If you need to find near-duplicates, one workable approach is to sort the list, add a helper column that scores each name against the one above, and flag high scores. Fuzzy Match Template for Google Sheets (US$9, no add-on install): <a href="https://snakback.gumroad.com/l/fuzzy-formulas">snakback.gumroad.com/l/fuzzy-formulas</a>. Its FUZZYSCORE(a, b) returns a similarity from 0 to 1, so a helper column such as FUZZYSCORE(A3, A2) can feed a rule or a filter. You paste the functions into your sheet once, so it works where a Workspace admin blocks add-ons. There is a 30-day refund if it does not work for you. For exact duplicates, the free formulas on this page are all you need.</p>
+<p>Duplicate Remover for Google Sheets™, our free add-on, can highlight duplicates across the columns you select, mark them in a &quot;Duplicate?&quot; column, or copy them to a new sheet. Install it free from the Google Workspace Marketplace: <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Duplicate Remover on the Marketplace</a>.</p>
+<p>Need to catch near-duplicates that exact formulas miss, such as &quot;Acme Pty Ltd&quot; and &quot;ACME Pty. Ltd&quot;? The Data Cleanup Kit for Google Sheets (US$15, no add-on install) groups them for you with FUZZYDUPES, and adds ready-made tabs for merging and summing, keeping the latest row, comparing lists, splitting names and cleaning text: <a href="https://snakback.gumroad.com/l/data-cleanup-kit">snakback.gumroad.com/l/data-cleanup-kit</a></p>
+<p>Snakbacks publishes the Duplicate Remover and Fuzzy Match add-ons.</p>
+<aside class="callout dedupe" aria-label="Free add-on"><img src="/assets/dedupe-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Duplicate Remover</span> <span class="tag">Free add-on</span></p>
+<p>Highlight duplicate rows, add a "Duplicate?" column, or copy the repeats to a new sheet, from the Extensions menu. No sidebar and no formulas to write.</p>
+<p><a href="/duplicate-remover">About Duplicate Remover</a> &middot; <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Get it on the Marketplace</a></p></div></aside>
+<div class="related"><h2 style="font-size:1.2rem;margin-top:0">More duplicates guides</h2><ul class="guide-list"><li><a href="/remove-duplicates-google-sheets">How to Remove Duplicates in Google Sheets: 5 Ways</a></li><li><a href="/remove-duplicates-google-sheets-multiple-columns">Remove Duplicates in Google Sheets by Multiple Columns</a></li><li><a href="/remove-duplicates-keep-latest-google-sheets">Remove Duplicates and Keep the Latest in Google Sheets</a></li><li><a href="/count-duplicates-google-sheets">How to Count Duplicates in Google Sheets (COUNTIF, QUERY)</a></li></ul><p><a href="/guides">All guides</a></p></div>
+</article></div>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div class="foot-grid">
+<div><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<p class="muted">A small Australian studio making Google Sheets add-ons.</p>
+<p>info@snakbacks.com<br>PO Box 1400, Burpengary D.C. QLD 4505, Australia</p></div>
+<div><h2>Products</h2><ul>
+<li><a href="/fuzzy-match">Fuzzy Match</a></li><li><a href="/duplicate-remover">Duplicate Remover</a></li><li><a href="/pro">Snakbacks Pro</a></li></ul></div>
+<div><h2>Resources</h2><ul>
+<li><a href="/guides">Guides</a></li><li><a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a></li><li><a href="https://snakback.gumroad.com/l/data-cleanup-kit">Data Cleanup Kit</a></li><li><a href="https://snakback.gumroad.com/l/levenshtein-starter">Levenshtein starter (free)</a></li></ul></div>
+<div><h2>Studio</h2><ul>
+<li><a href="/about">About</a></li><li><a href="/takeover">Add-on takeover</a></li><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="mailto:info@snakbacks.com">Contact</a></li></ul></div>
+</div>
+<p class="fine">Google Sheets, Google Workspace and Google Workspace Marketplace are trademarks of Google LLC. Snakbacks is not affiliated with or endorsed by Google. No tracking or analytics on this site.</p>
+</div></footer>
+</body>
+</html>

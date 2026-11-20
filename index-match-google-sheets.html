@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>INDEX MATCH in Google Sheets: Syntax, Examples, vs VLOOKUP | Snakbacks</title>
+<meta name="description" content="INDEX and MATCH together look up a value in one column and return the matching value from any other column. They do what VLOOKUP does, plus left lookups,...">
+<link rel="canonical" href="https://www.snakbacks.com/index-match-google-sheets">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1a5fa0">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Snakbacks">
+<meta property="og:title" content="INDEX MATCH in Google Sheets: Syntax, Examples, vs VLOOKUP | Snakbacks">
+<meta property="og:description" content="INDEX and MATCH together look up a value in one column and return the matching value from any other column. They do what VLOOKUP does, plus left lookups,...">
+<meta property="og:url" content="https://www.snakbacks.com/index-match-google-sheets">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"INDEX MATCH in Google Sheets: Syntax, Examples, vs VLOOKUP","author":{"@type":"Organization","name":"Snakbacks"},"publisher":{"@type":"Organization","name":"Snakbacks"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<nav aria-label="Main"><ul class="nav">
+<li><a href="/#products">Products</a></li>
+<li><a href="/guides" aria-current="page">Guides</a></li>
+<li><a href="/pro">Pro</a></li>
+<li><a href="/takeover">Takeover</a></li>
+<li><a href="/about">About</a></li>
+</ul></nav>
+</div></header>
+<main id="main">
+<div class="wrap"><article class="page-head prose">
+<p class="crumbs"><a href="/">Home</a> / <a href="/guides">Guides</a> / <a href="/guides#lookups">Lookups and matching</a></p>
+<h1 style="font-size:clamp(1.8rem,5vw,2.6rem)">INDEX MATCH in Google Sheets: Syntax, Examples, vs VLOOKUP</h1>
+<p class="ailine">Written with AI assistance; tested in a real Google Sheet.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<p>INDEX and MATCH together look up a value in one column and return the matching value from any other column. They do what VLOOKUP does, plus left lookups, two-way lookups and lookups on several criteria. This page covers the syntax, each use with a worked example, and the one trap that catches most people.</p>
+<h2>The sample data</h2>
+<p>Row 1 holds headers.</p>
+<p>Master list, D2:E5 (name, ID):</p>
+<ul><li>Initech, 101</li><li>Umbrella Corp, 102</li><li>Acme Pty Ltd, 103</li><li>Globex Corporation, 104</li></ul>
+<p>Sales table, G1:J4 (rows are products, columns are quarters):</p>
+<ul><li>G1:J1 headers: Product, Q1, Q2, Q3</li><li>Widget, 10, 20, 30</li><li>Gadget, 40, 50, 60</li><li>Gizmo, 70, 80, 90</li></ul>
+<p>Orders, A2:C6 (customer, region, amount):</p>
+<ul><li>Acme, East, 100</li><li>Globex, West, 50</li><li>Acme, West, 25</li><li>Acme, East, 10</li><li>Globex, West, 70</li></ul>
+<h2>The syntax</h2>
+<p>MATCH finds a position. INDEX returns the value at a position.</p>
+<pre><code>=MATCH(103,$E$2:$E$5,0)
+=INDEX($D$2:$D$5,3)
+=INDEX($D$2:$D$5,MATCH(103,$E$2:$E$5,0))</code></pre>
+<p>The first returns 3 (103 is third in the list). The second returns Acme Pty Ltd (third item of the names). The third combines them and returns Acme Pty Ltd. The 0 in MATCH means exact match.</p>
+<h2>Left lookup</h2>
+<p>VLOOKUP can only return from columns to the right of the one it searches. INDEX MATCH has no such limit, because you give it the search column and the return column separately. To find a name from an ID, as above, or an ID from a name:</p>
+<pre><code>=INDEX($E$2:$E$5,MATCH(&quot;Initech&quot;,$D$2:$D$5,0))</code></pre>
+<p>This returns 101. Because it refers to the columns directly rather than counting a column number, inserting a column in between does not break it.</p>
+<h2>Two-way lookup</h2>
+<p>Use one MATCH for the row and another for the column. With the product in L1 and the quarter in L2:</p>
+<pre><code>=INDEX($H$2:$J$4,MATCH(L1,$G$2:$G$4,0),MATCH(L2,$H$1:$J$1,0))</code></pre>
+<p>With L1 = Gadget and L2 = Q2, this returns 50.</p>
+<h2>Multiple criteria</h2>
+<p>To match on customer and region together, multiply two tests so the result is 1 only where both are true, then find the first 1:</p>
+<pre><code>=INDEX($C$2:$C$6,MATCH(1,ARRAYFORMULA(($A$2:$A$6=&quot;Acme&quot;)*($B$2:$B$6=&quot;West&quot;)),0))</code></pre>
+<p>This returns 25. The ARRAYFORMULA makes the comparison run over the whole range. Add a third test by multiplying a third bracket. It returns the first row that satisfies every test, which here is the only one.</p>
+<p>If you prefer something easier to read, build a helper key. In F2, filled down:</p>
+<pre><code>=A2&amp;&quot;|&quot;&amp;B2</code></pre>
+<p>Then look up the joined text:</p>
+<pre><code>=INDEX($C$2:$C$6,MATCH(&quot;Acme|West&quot;,$F$2:$F$6,0))</code></pre>
+<p>This also returns 25. The separator stops &quot;AB&quot;+&quot;C&quot; from matching &quot;A&quot;+&quot;BC&quot;.</p>
+<h2>Handling not found</h2>
+<p>When there is no match, MATCH returns #N/A, and so does INDEX. Catch only that error with IFNA:</p>
+<pre><code>=IFNA(INDEX($E$2:$E$5,MATCH(&quot;Wayne&quot;,$D$2:$D$5,0)),&quot;Not found&quot;)</code></pre>
+<p>This shows Not found. IFNA is safer than IFERROR here, because IFERROR also hides genuine mistakes such as a wrong range.</p>
+<h2>The match_type trap</h2>
+<p>MATCH takes a third argument, and if you leave it out it is 1, not 0. A match_type of 1 does an approximate search that expects the list sorted ascending, and on an unsorted list it can return a wrong position without any error. On the unsorted name list D2:D5 above, =MATCH(&quot;Initech&quot;,$D$2:$D$5) returned 4 in our test, although Initech is in position 1. Always write 0:</p>
+<pre><code>=MATCH(&quot;Acme Pty Ltd&quot;,$D$2:$D$5,0)</code></pre>
+<p>This returns 3. The same trap catches VLOOKUP when the last argument is left out. Use 1 deliberately only for sorted lookups such as tax bands or grade boundaries.</p>
+<h2>When the lookup still fails</h2>
+<p>If INDEX MATCH gives #N/A for a value you can see, the cause is almost always hidden spaces, text versus number, or a typo. Our #N/A guide walks through each: <a href="/vlookup-na-error-google-sheets">VLOOKUP Returns #N/A in Google Sheets: Causes and Fixes</a></p>
+<h2>INDEX MATCH or XLOOKUP?</h2>
+<p>XLOOKUP does the same left and right lookups in a single function, has a built-in not-found argument, and defaults to exact match, so it avoids the match_type trap. If you are starting fresh, it is simpler. See <a href="/xlookup-google-sheets">XLOOKUP in Google Sheets: Syntax, Wildcards and Examples</a> INDEX MATCH is still worth knowing because it works everywhere, and the multiple-criteria pattern above is the usual way to do that job.</p>
+<h2>When an add-on or script pack helps</h2>
+<p>Disclosure: Snakbacks, the publisher of this site, sells a paid script pack and makes two free add-ons for Google Sheets.</p>
+<p>Exact lookups need only the formulas above. If your keys are spelled differently in the two lists, such as &quot;Acme Pty Ltd&quot; and &quot;ACME Pty. Ltd&quot;, the Fuzzy Match Template for Google Sheets (US$9, no add-on install): <a href="https://snakback.gumroad.com/l/fuzzy-formulas">snakback.gumroad.com/l/fuzzy-formulas</a> adds fuzzy VLOOKUP-style formulas that match by similarity.</p>
+<p>Our free add-on Fuzzy Match is now on the Google Workspace Marketplace: <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Fuzzy Match on the Marketplace</a>. Duplicate Remover is now on the Marketplace too: <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Duplicate Remover on the Marketplace</a>.</p>
+<p>Snakbacks publishes the Duplicate Remover and Fuzzy Match add-ons.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<div class="related"><h2 style="font-size:1.2rem;margin-top:0">More lookups and matching guides</h2><ul class="guide-list"><li><a href="/vlookup-na-error-google-sheets">VLOOKUP Returns #N/A in Google Sheets: Causes and Fixes</a></li><li><a href="/vlookup-partial-match-google-sheets">VLOOKUP Partial Match in Google Sheets (Wildcards, Contains)</a></li><li><a href="/xlookup-google-sheets">XLOOKUP in Google Sheets: Syntax, Wildcards and Examples</a></li><li><a href="/case-insensitive-match-google-sheets">Case-Sensitive and Case-Insensitive Match in Google Sheets</a></li></ul><p><a href="/guides">All guides</a></p></div>
+</article></div>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div class="foot-grid">
+<div><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<p class="muted">A small Australian studio making Google Sheets add-ons.</p>
+<p>info@snakbacks.com<br>PO Box 1400, Burpengary D.C. QLD 4505, Australia</p></div>
+<div><h2>Products</h2><ul>
+<li><a href="/fuzzy-match">Fuzzy Match</a></li><li><a href="/duplicate-remover">Duplicate Remover</a></li><li><a href="/pro">Snakbacks Pro</a></li></ul></div>
+<div><h2>Resources</h2><ul>
+<li><a href="/guides">Guides</a></li><li><a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a></li><li><a href="https://snakback.gumroad.com/l/data-cleanup-kit">Data Cleanup Kit</a></li><li><a href="https://snakback.gumroad.com/l/levenshtein-starter">Levenshtein starter (free)</a></li></ul></div>
+<div><h2>Studio</h2><ul>
+<li><a href="/about">About</a></li><li><a href="/takeover">Add-on takeover</a></li><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="mailto:info@snakbacks.com">Contact</a></li></ul></div>
+</div>
+<p class="fine">Google Sheets, Google Workspace and Google Workspace Marketplace are trademarks of Google LLC. Snakbacks is not affiliated with or endorsed by Google. No tracking or analytics on this site.</p>
+</div></footer>
+</body>
+</html>

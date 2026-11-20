@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>XLOOKUP in Google Sheets: Syntax, Wildcards and Examples | Snakbacks</title>
+<meta name="description" content="XLOOKUP is the newer, more flexible replacement for VLOOKUP. It searches one range, returns from another, and can look left, return several columns, find...">
+<link rel="canonical" href="https://www.snakbacks.com/xlookup-google-sheets">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1a5fa0">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Snakbacks">
+<meta property="og:title" content="XLOOKUP in Google Sheets: Syntax, Wildcards and Examples | Snakbacks">
+<meta property="og:description" content="XLOOKUP is the newer, more flexible replacement for VLOOKUP. It searches one range, returns from another, and can look left, return several columns, find...">
+<meta property="og:url" content="https://www.snakbacks.com/xlookup-google-sheets">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"XLOOKUP in Google Sheets: Syntax, Wildcards and Examples","author":{"@type":"Organization","name":"Snakbacks"},"publisher":{"@type":"Organization","name":"Snakbacks"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<nav aria-label="Main"><ul class="nav">
+<li><a href="/#products">Products</a></li>
+<li><a href="/guides" aria-current="page">Guides</a></li>
+<li><a href="/pro">Pro</a></li>
+<li><a href="/takeover">Takeover</a></li>
+<li><a href="/about">About</a></li>
+</ul></nav>
+</div></header>
+<main id="main">
+<div class="wrap"><article class="page-head prose">
+<p class="crumbs"><a href="/">Home</a> / <a href="/guides">Guides</a> / <a href="/guides#lookups">Lookups and matching</a></p>
+<h1 style="font-size:clamp(1.8rem,5vw,2.6rem)">XLOOKUP in Google Sheets: Syntax, Wildcards and Examples</h1>
+<p class="ailine">Written with AI assistance; tested in a real Google Sheet.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<p>XLOOKUP is the newer, more flexible replacement for VLOOKUP. It searches one range, returns from another, and can look left, return several columns, find the last match and match approximately. This page covers each use with a short formula, and ends with what XLOOKUP still cannot do.</p>
+<h2>Syntax</h2>
+<pre><code>=XLOOKUP(search_key, lookup_range, result_range, [missing_value], [match_mode], [search_mode])</code></pre>
+<ul><li>match_mode: 0 exact (the default), -1 exact or next smaller, 1 exact or next larger, 2 wildcard.</li><li>search_mode: 1 first to last (the default), -1 last to first.</li></ul>
+<h2>XLOOKUP vs VLOOKUP</h2>
+<ul><li>XLOOKUP defaults to exact match. VLOOKUP defaults to approximate unless you type FALSE.</li><li>XLOOKUP takes a result range, not a column number, so inserting a column does not break it.</li><li>XLOOKUP can return from the left of the search column. VLOOKUP cannot.</li><li>XLOOKUP has a built-in not-found value, so you do not need IFNA.</li></ul>
+<h2>The sample data</h2>
+<p>Row 1 holds headers. Master list, D2:F5 (name, ID, city):</p>
+<ul><li>Initech, 101, Perth</li><li>Umbrella Corp, 102, Sydney</li><li>Acme Pty Ltd, 103, Melbourne</li><li>Globex Corporation, 104, Brisbane</li></ul>
+<h2>Exact match with a not-found value</h2>
+<pre><code>=XLOOKUP(&quot;Acme Pty Ltd&quot;,$D$2:$D$5,$E$2:$E$5,&quot;Not found&quot;)</code></pre>
+<p>This returns 103. With &quot;Wayne&quot; it shows Not found. If you leave out the fourth argument, a missing value returns #N/A. For the causes of #N/A in lookups, see <a href="/vlookup-na-error-google-sheets">VLOOKUP Returns #N/A in Google Sheets: Causes and Fixes</a></p>
+<h2>Return multiple columns</h2>
+<p>Give a result range that is wider than one column:</p>
+<pre><code>=XLOOKUP(&quot;Acme Pty Ltd&quot;,$D$2:$D$5,$E$2:$F$5,&quot;Not found&quot;)</code></pre>
+<p>It spills into two cells: 103 and Melbourne. Keep the cells to the right empty, or you get #REF!.</p>
+<h2>Search right to left</h2>
+<p>Search the ID column and return the name from the column on its left:</p>
+<pre><code>=XLOOKUP(103,$E$2:$E$5,$D$2:$D$5,&quot;Not found&quot;)</code></pre>
+<p>This returns Acme Pty Ltd. VLOOKUP cannot do this without INDEX and MATCH.</p>
+<h2>Wildcard match (match_mode 2)</h2>
+<p>Wildcards only work when match_mode is 2. Use * for any run of characters, ? for one character, and ~ before a * or ? to find it literally.</p>
+<pre><code>=XLOOKUP(&quot;*Corp*&quot;,$D$2:$D$5,$E$2:$E$5,&quot;Not found&quot;,2)</code></pre>
+<p>This returns 102 (Umbrella Corp), the first match. Both Umbrella Corp and Globex Corporation contain &quot;Corp&quot;, so XLOOKUP returns the first row it finds. To match a typed cell, join the wildcards on: &quot;*&quot;&amp;A2&amp;&quot;*&quot;. Without the 2, the stars are treated as ordinary characters and nothing matches. The VLOOKUP version is here: <a href="/vlookup-partial-match-google-sheets">VLOOKUP Partial Match in Google Sheets (Wildcards, Contains)</a></p>
+<h2>Last match (search_mode -1)</h2>
+<p>Take Customer in A2:A6 and Amount in C2:C6: Acme 100, Globex 50, Acme 25, Acme 10, Globex 70. To get the latest amount for a customer, search from the bottom:</p>
+<pre><code>=XLOOKUP(&quot;Acme&quot;,$A$2:$A$6,$C$2:$C$6,&quot;Not found&quot;,0,-1)</code></pre>
+<p>This returns 10, the last Acme row. The default (search_mode 1) returns 100. For a whole-table version of &quot;keep the latest&quot;, see <a href="/remove-duplicates-keep-latest-google-sheets">Remove Duplicates and Keep the Latest in Google Sheets</a></p>
+<h2>Approximate match: bands and brackets</h2>
+<p>With match_mode -1, XLOOKUP returns the row whose key is the exact value or the next smaller one. That suits bands that start at a threshold. Illustrative brackets (made-up numbers, not real tax rates), G2:H5:</p>
+<ul><li>0, 10%</li><li>10000, 15%</li><li>40000, 25%</li><li>90000, 30%</li></ul>
+<pre><code>=XLOOKUP(52000,$G$2:$G$5,$H$2:$H$5,&quot;Below range&quot;,-1)</code></pre>
+<p>This returns 25%, the bracket starting at 40000. An income of 40000 exactly also gives 25%. A grade table works the same way: starting scores 0 F, 50 D, 60 C, 70 B, 80 A. A score of 73 with match_mode -1 returns B.</p>
+<p>With match_mode 1 you get the next larger value instead. For shipping with weight limits 1, 5 and 10 kg priced 5, 9 and 15, a 3 kg parcel looks up 5 and returns 9:</p>
+<pre><code>=XLOOKUP(3,$J$2:$J$4,$K$2:$K$4,&quot;Too heavy&quot;,1)</code></pre>
+<p>A 12 kg parcel returns Too heavy.</p>
+<h2>What XLOOKUP still needs: exact text</h2>
+<p>Exact mode needs the text to be identical. &quot;Initech &quot; with a trailing space, or &quot;Inytech&quot; with a typo, comes back as Not found. Trimming fixes spaces:</p>
+<pre><code>=XLOOKUP(TRIM(A2),$D$2:$D$5,$E$2:$E$5,&quot;Not found&quot;)</code></pre>
+<p>Wildcards help when one string sits inside another. Neither fixes typos, swapped words or different spellings, because there is no similarity setting in XLOOKUP. For that you match by similarity: <a href="/match-names-with-typos-google-sheets">Match Names with Typos in Google Sheets (Fuzzy Name Matching)</a></p>
+<h2>When an add-on or script pack helps</h2>
+<p>Disclosure: Snakbacks, the publisher of this site, sells a paid script pack and makes two free add-ons for Google Sheets.</p>
+<p>If your search values are typos or spelling variants of the master list, the Fuzzy Match Template for Google Sheets (US$9, no add-on install): <a href="https://snakback.gumroad.com/l/fuzzy-formulas">snakback.gumroad.com/l/fuzzy-formulas</a> adds FUZZYLOOKUP(values, lookup, return_range, [threshold]) and FUZZYSCORE(a, b), pasted into your sheet once, with a 30-day refund if it does not help. Everything else on this page needs only the free formulas above.</p>
+<p>Our free add-on Fuzzy Match is now on the Google Workspace Marketplace: <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Fuzzy Match on the Marketplace</a>. Duplicate Remover is now on the Marketplace too: <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Duplicate Remover on the Marketplace</a>.</p>
+<p>Tip: after installing, open Extensions &gt; Fuzzy Match &gt; How to use once in each new spreadsheet. Until you do, its formulas can show #NAME?.</p>
+<p>Snakbacks publishes the Duplicate Remover and Fuzzy Match add-ons.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<div class="related"><h2 style="font-size:1.2rem;margin-top:0">More lookups and matching guides</h2><ul class="guide-list"><li><a href="/vlookup-na-error-google-sheets">VLOOKUP Returns #N/A in Google Sheets: Causes and Fixes</a></li><li><a href="/vlookup-partial-match-google-sheets">VLOOKUP Partial Match in Google Sheets (Wildcards, Contains)</a></li><li><a href="/index-match-google-sheets">INDEX MATCH in Google Sheets: Syntax, Examples, vs VLOOKUP</a></li><li><a href="/case-insensitive-match-google-sheets">Case-Sensitive and Case-Insensitive Match in Google Sheets</a></li></ul><p><a href="/guides">All guides</a></p></div>
+</article></div>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div class="foot-grid">
+<div><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<p class="muted">A small Australian studio making Google Sheets add-ons.</p>
+<p>info@snakbacks.com<br>PO Box 1400, Burpengary D.C. QLD 4505, Australia</p></div>
+<div><h2>Products</h2><ul>
+<li><a href="/fuzzy-match">Fuzzy Match</a></li><li><a href="/duplicate-remover">Duplicate Remover</a></li><li><a href="/pro">Snakbacks Pro</a></li></ul></div>
+<div><h2>Resources</h2><ul>
+<li><a href="/guides">Guides</a></li><li><a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a></li><li><a href="https://snakback.gumroad.com/l/data-cleanup-kit">Data Cleanup Kit</a></li><li><a href="https://snakback.gumroad.com/l/levenshtein-starter">Levenshtein starter (free)</a></li></ul></div>
+<div><h2>Studio</h2><ul>
+<li><a href="/about">About</a></li><li><a href="/takeover">Add-on takeover</a></li><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="mailto:info@snakbacks.com">Contact</a></li></ul></div>
+</div>
+<p class="fine">Google Sheets, Google Workspace and Google Workspace Marketplace are trademarks of Google LLC. Snakbacks is not affiliated with or endorsed by Google. No tracking or analytics on this site.</p>
+</div></footer>
+</body>
+</html>

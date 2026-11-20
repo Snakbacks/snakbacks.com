@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Compare Two Columns in Google Sheets and Find Duplicates | Snakbacks</title>
+<meta name="description" content="To compare two columns in Google Sheets, you usually want one of three answers: which items appear in both, which are only in column A, and which are only...">
+<link rel="canonical" href="https://www.snakbacks.com/compare-two-columns-duplicates">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1a5fa0">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Snakbacks">
+<meta property="og:title" content="Compare Two Columns in Google Sheets and Find Duplicates | Snakbacks">
+<meta property="og:description" content="To compare two columns in Google Sheets, you usually want one of three answers: which items appear in both, which are only in column A, and which are only...">
+<meta property="og:url" content="https://www.snakbacks.com/compare-two-columns-duplicates">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Compare Two Columns in Google Sheets and Find Duplicates","author":{"@type":"Organization","name":"Snakbacks"},"publisher":{"@type":"Organization","name":"Snakbacks"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<nav aria-label="Main"><ul class="nav">
+<li><a href="/#products">Products</a></li>
+<li><a href="/guides" aria-current="page">Guides</a></li>
+<li><a href="/pro">Pro</a></li>
+<li><a href="/takeover">Takeover</a></li>
+<li><a href="/about">About</a></li>
+</ul></nav>
+</div></header>
+<main id="main">
+<div class="wrap"><article class="page-head prose">
+<p class="crumbs"><a href="/">Home</a> / <a href="/guides">Guides</a> / <a href="/guides#duplicates">Duplicates</a></p>
+<h1 style="font-size:clamp(1.8rem,5vw,2.6rem)">Compare Two Columns in Google Sheets and Find Duplicates</h1>
+<p class="ailine">Written with AI assistance; tested in a real Google Sheet.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<p>To compare two columns in Google Sheets, you usually want one of three answers: which items appear in both, which are only in column A, and which are only in column B. This page gives a formula for each, plus a way to highlight the matches.</p>
+<h2>The sample data</h2>
+<p>Column A (A2:A6): Apple, Banana, Cherry, Date, Elderberry</p>
+<p>Column B (B2:B5): banana, Fig, Date, Grape</p>
+<p>Row 1 holds the headers. Note that &quot;banana&quot; in B is lower case. Matching in these formulas ignores case, so it still counts as a match.</p>
+<h2>Flag each item in column A</h2>
+<p>In C2, fill down:</p>
+<pre><code>=IF(A2=&quot;&quot;,&quot;&quot;,IF(COUNTIF($B$2:$B$100,A2)&gt;0,&quot;In both&quot;,&quot;Only in A&quot;))</code></pre>
+<p>COUNTIF counts how many times the value in A2 appears in column B. If the count is more than zero, it exists in both. The empty-cell check stops blank rows from being labelled.</p>
+<p>Result on the sample: Apple is Only in A, Banana is In both, Cherry is Only in A, Date is In both, Elderberry is Only in A.</p>
+<h3>The MATCH version</h3>
+<p>MATCH does the same job and some people find it easier to read:</p>
+<pre><code>=IF(A2=&quot;&quot;,&quot;&quot;,IF(ISNUMBER(MATCH(A2,$B$2:$B$100,0)),&quot;In both&quot;,&quot;Only in A&quot;))</code></pre>
+<p>It gives the same result. The 0 means exact match. If the lookup fails, MATCH returns an error, and ISNUMBER turns that into FALSE.</p>
+<h3>One formula for the whole column</h3>
+<p>Instead of filling down, use a single formula in C2. The sheet fills it for you:</p>
+<pre><code>=ARRAYFORMULA(IF(A2:A6=&quot;&quot;,&quot;&quot;,IF(COUNTIF(B2:B6,A2:A6)&gt;0,&quot;In both&quot;,&quot;Only in A&quot;)))</code></pre>
+<p>Use a range that covers your data. Pointing it at an entire column such as A2:A also works, but it will be slower.</p>
+<h2>List the items, not just flag them</h2>
+<h3>Only in A</h3>
+<pre><code>=IFERROR(FILTER(A2:A6, A2:A6&lt;&gt;&quot;&quot;, COUNTIF(B2:B6, A2:A6)=0), &quot;None&quot;)</code></pre>
+<p>Returns Apple, Cherry, Elderberry, one per row.</p>
+<h3>Only in B</h3>
+<pre><code>=IFERROR(FILTER(B2:B5, B2:B5&lt;&gt;&quot;&quot;, COUNTIF(A2:A6, B2:B5)=0), &quot;None&quot;)</code></pre>
+<p>Returns Fig and Grape.</p>
+<h3>In both (the duplicates between the two lists)</h3>
+<pre><code>=IFERROR(FILTER(A2:A6, A2:A6&lt;&gt;&quot;&quot;, COUNTIF(B2:B6, A2:A6)&gt;0), &quot;None&quot;)</code></pre>
+<p>Returns Banana and Date. IFERROR is there because FILTER gives an error when it finds nothing, and &quot;None&quot; is a friendlier result.</p>
+<p>If your lists grow, extend the ranges, for example to A2:A1000. Keep the ranges the same size inside each pair.</p>
+<h2>Compare row by row</h2>
+<p>Sometimes you do not want to search the whole list. You want to know whether A2 equals B2 on the same row, for example when comparing an old and new version of the same sheet.</p>
+<pre><code>=A2=B2</code></pre>
+<p>This returns TRUE or FALSE and ignores case. For a case-sensitive check, use:</p>
+<pre><code>=EXACT(A2,B2)</code></pre>
+<p>Try it with these rows. A2:A4 is Red, Blue, Green and B2:B4 is red, Blue, Teal. The first formula gives TRUE, TRUE, FALSE. EXACT gives FALSE, TRUE, FALSE, because &quot;Red&quot; and &quot;red&quot; differ in case.</p>
+<h2>Highlight matches</h2>
+<p>Select A2:A100, open Format &gt; Conditional formatting, choose &quot;Custom formula is&quot;, and enter:</p>
+<pre><code>=COUNTIF($B$2:$B$100,$A2)&gt;0</code></pre>
+<p>Every value in column A that also appears in column B is coloured. On the sample, Banana and Date are highlighted. To highlight the values that are only in A, change the test to <code>=AND($A2&lt;&gt;&quot;&quot;,COUNTIF($B$2:$B$100,$A2)=0)</code>. To colour column B instead, select B2:B100 and swap the references: <code>=COUNTIF($A$2:$A$100,$B2)&gt;0</code>.</p>
+<p>The dollar signs matter. $B$2:$B$100 keeps the lookup range fixed, and $A2 lets the row move as the rule is applied down the column.</p>
+<h2>Why a match was missed</h2>
+<p>Most &quot;it should have matched&quot; problems come from three things.</p>
+<ul><li>Extra spaces. &quot;Date &quot; is not the same as &quot;Date&quot;. Run Data &gt; Data cleanup &gt; Trim whitespace on both columns first.</li><li>Numbers stored as text. A cell showing 1001 might be text in one column and a number in the other. They will not match. Convert both to the same type.</li><li>Small spelling differences. &quot;Jon Smith&quot; and &quot;John Smith&quot; are different strings to every formula above. Formulas compare exactly, so near-misses need fuzzy matching.</li></ul>
+<h2>When an add-on helps</h2>
+<p>Disclosure: Snakbacks, the publisher of this site, makes two free add-ons for Google Sheets.</p>
+<p>Duplicate Remover for Google Sheets™ finds repeated rows within a sheet on the columns you select, ignoring case and extra spaces, and can highlight them, mark them or copy them out. It is built for duplicates inside one list, not for comparing two separate lists. If you stack both lists into one column, it can highlight the values that appear twice, which are the ones in both. For a straight A versus B comparison, the formulas above are the right tool.</p>
+<p>Fuzzy Match: Fuzzy VLOOKUP for Sheets is for the near-misses. FUZZYSCORE(A2, B2) gives a similarity from 0 to 1, and FUZZYMATCH returns the closest value from a clean list, so &quot;Acme Pty. Ltd&quot; can find &quot;ACME Pty Ltd&quot; even though the text differs.</p>
+<p>Duplicate Remover is free on the Google Workspace Marketplace: <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Duplicate Remover on the Marketplace</a>. Fuzzy Match is free on the Google Workspace Marketplace: <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Fuzzy Match on the Marketplace</a>.</p>
+<p>Tip: after installing, open Extensions &gt; Fuzzy Match &gt; How to use once in each new spreadsheet. Until you do, its formulas can show #NAME?.</p>
+<p>To compare two lists where the same item is spelled differently, Snakbacks also sells Fuzzy Match Template for Google Sheets (US$9, no add-on install): <a href="https://snakback.gumroad.com/l/fuzzy-formulas">snakback.gumroad.com/l/fuzzy-formulas</a>. FUZZYMATCH can return the closest value from list B for each item in list A.</p>
+<p>Need to catch near-duplicates that exact formulas miss, such as &quot;Acme Pty Ltd&quot; and &quot;ACME Pty. Ltd&quot;? The Data Cleanup Kit for Google Sheets (US$15, no add-on install) groups them for you with FUZZYDUPES, and adds ready-made tabs for merging and summing, keeping the latest row, comparing lists, splitting names and cleaning text: <a href="https://snakback.gumroad.com/l/data-cleanup-kit">snakback.gumroad.com/l/data-cleanup-kit</a></p>
+<p>Snakbacks publishes the Duplicate Remover and Fuzzy Match add-ons.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<div class="related"><h2 style="font-size:1.2rem;margin-top:0">More duplicates guides</h2><ul class="guide-list"><li><a href="/remove-duplicates-google-sheets">How to Remove Duplicates in Google Sheets: 5 Ways</a></li><li><a href="/remove-duplicates-google-sheets-multiple-columns">Remove Duplicates in Google Sheets by Multiple Columns</a></li><li><a href="/remove-duplicates-keep-latest-google-sheets">Remove Duplicates and Keep the Latest in Google Sheets</a></li><li><a href="/highlight-duplicates-google-sheets">How to Highlight Duplicates in Google Sheets (Formulas)</a></li></ul><p><a href="/guides">All guides</a></p></div>
+</article></div>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div class="foot-grid">
+<div><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<p class="muted">A small Australian studio making Google Sheets add-ons.</p>
+<p>info@snakbacks.com<br>PO Box 1400, Burpengary D.C. QLD 4505, Australia</p></div>
+<div><h2>Products</h2><ul>
+<li><a href="/fuzzy-match">Fuzzy Match</a></li><li><a href="/duplicate-remover">Duplicate Remover</a></li><li><a href="/pro">Snakbacks Pro</a></li></ul></div>
+<div><h2>Resources</h2><ul>
+<li><a href="/guides">Guides</a></li><li><a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a></li><li><a href="https://snakback.gumroad.com/l/data-cleanup-kit">Data Cleanup Kit</a></li><li><a href="https://snakback.gumroad.com/l/levenshtein-starter">Levenshtein starter (free)</a></li></ul></div>
+<div><h2>Studio</h2><ul>
+<li><a href="/about">About</a></li><li><a href="/takeover">Add-on takeover</a></li><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="mailto:info@snakbacks.com">Contact</a></li></ul></div>
+</div>
+<p class="fine">Google Sheets, Google Workspace and Google Workspace Marketplace are trademarks of Google LLC. Snakbacks is not affiliated with or endorsed by Google. No tracking or analytics on this site.</p>
+</div></footer>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How to Remove Duplicates in Google Sheets: 5 Ways | Snakbacks</title>
+<meta name="description" content="There are five reasonable ways to remove duplicates in Google Sheets, and they suit different jobs. Pick by whether you want to delete the extra rows,...">
+<link rel="canonical" href="https://www.snakbacks.com/remove-duplicates-google-sheets">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1a5fa0">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Snakbacks">
+<meta property="og:title" content="How to Remove Duplicates in Google Sheets: 5 Ways | Snakbacks">
+<meta property="og:description" content="There are five reasonable ways to remove duplicates in Google Sheets, and they suit different jobs. Pick by whether you want to delete the extra rows,...">
+<meta property="og:url" content="https://www.snakbacks.com/remove-duplicates-google-sheets">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"How to Remove Duplicates in Google Sheets: 5 Ways","author":{"@type":"Organization","name":"Snakbacks"},"publisher":{"@type":"Organization","name":"Snakbacks"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<nav aria-label="Main"><ul class="nav">
+<li><a href="/#products">Products</a></li>
+<li><a href="/guides" aria-current="page">Guides</a></li>
+<li><a href="/pro">Pro</a></li>
+<li><a href="/takeover">Takeover</a></li>
+<li><a href="/about">About</a></li>
+</ul></nav>
+</div></header>
+<main id="main">
+<div class="wrap"><article class="page-head prose">
+<p class="crumbs"><a href="/">Home</a> / <a href="/guides">Guides</a> / <a href="/guides#duplicates">Duplicates</a></p>
+<h1 style="font-size:clamp(1.8rem,5vw,2.6rem)">How to Remove Duplicates in Google Sheets: 5 Ways</h1>
+<p class="ailine">Written with AI assistance; tested in a real Google Sheet.</p>
+<aside class="callout dedupe" aria-label="Free add-on"><img src="/assets/dedupe-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Duplicate Remover</span> <span class="tag">Free add-on</span></p>
+<p>Highlight duplicate rows, add a "Duplicate?" column, or copy the repeats to a new sheet, from the Extensions menu. No sidebar and no formulas to write.</p>
+<p><a href="/duplicate-remover">About Duplicate Remover</a> &middot; <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Get it on the Marketplace</a></p></div></aside>
+<p>There are five reasonable ways to remove duplicates in Google Sheets, and they suit different jobs. Pick by whether you want to delete the extra rows, keep the original and show a clean copy, or only mark the repeats. This page is the overview, with links to the detailed guides.</p>
+<h2>The sample data</h2>
+<p>Names in A2:A7, row 1 holds a header:</p>
+<ul><li>Acme</li><li>Globex</li><li>Acme</li><li>Initech</li><li>Globex</li><li>acme</li></ul>
+<p>Note the last row is lower-case. Whether &quot;acme&quot; is a duplicate of &quot;Acme&quot; depends on the method, as covered below.</p>
+<h2>Way 1: the built-in Data cleanup tool</h2>
+<p>Select the range, then choose Data &gt; Data cleanup &gt; Remove duplicates. A dialog asks whether your data has a header row and which columns to compare. Confirm and the extra rows are deleted from the sheet itself, which is permanent apart from Undo. Work on a copy of the tab the first time. Try it on a few differently capitalised rows before relying on it for case. For several columns at once, see <a href="/remove-duplicates-google-sheets-multiple-columns">Remove Duplicates in Google Sheets by Multiple Columns</a></p>
+<h2>Way 2: the UNIQUE function</h2>
+<pre><code>=UNIQUE(A2:A7)</code></pre>
+<p>This returns Acme, Globex, Initech, acme, a clean copy that leaves the original untouched and updates when the source changes. UNIQUE is case-sensitive, so &quot;acme&quot; is kept as its own value. COUNTUNIQUE(A2:A7) also returns 4. To ignore case, lowercase first:</p>
+<pre><code>=UNIQUE(ARRAYFORMULA(LOWER(A2:A7)))</code></pre>
+<p>This returns acme, globex, initech. For more on case, see <a href="/case-insensitive-match-google-sheets">Case-Sensitive and Case-Insensitive Match in Google Sheets</a></p>
+<h3>UNIQUE with blank rows</h3>
+<p>If you use a range that runs past your data, such as =UNIQUE(A2:A100), the output includes an extra blank row for the empty cells. Filter the blanks out first:</p>
+<pre><code>=UNIQUE(FILTER(A2:A100,A2:A100&lt;&gt;&quot;&quot;))</code></pre>
+<h2>Way 3: flag with COUNTIF, then filter</h2>
+<p>In B2, filled down to B7:</p>
+<pre><code>=COUNTIF($A$2:A2,A2)</code></pre>
+<p>This gives 1, 1, 2, 1, 2, 3. A value of 1 is the first appearance, so anything above 1 is a repeat. COUNTIF ignores case, so &quot;acme&quot; counts as the third Acme. To keep only the first of each:</p>
+<pre><code>=FILTER(A2:A7,B2:B7=1)</code></pre>
+<p>This returns Acme, Globex, Initech. Or select the data and use Data &gt; Create a filter to hide the rows where B is above 1, then delete the visible rows you want gone. Counting rather than removing is covered at <a href="/count-duplicates-google-sheets">How to Count Duplicates in Google Sheets (COUNTIF, QUERY)</a></p>
+<h2>Way 4: highlight with conditional formatting</h2>
+<p>If you only need to see the duplicates, use Format &gt; Conditional formatting, choose Custom formula is, and enter:</p>
+<pre><code>=COUNTIF($A$2:$A$7,A2)&gt;1</code></pre>
+<p>Every value that appears more than once is shaded, including its first appearance. Nothing is deleted. The full walkthrough, including multiple columns, is at <a href="/highlight-duplicates-google-sheets">How to Highlight Duplicates in Google Sheets (Formulas)</a></p>
+<h2>Way 5: near-duplicates</h2>
+<p>All four methods above need identical text (with case varying as noted). &quot;Acme Pty Ltd&quot;, &quot;ACME Pty. Ltd&quot; and &quot;Acme Pty Limited&quot; are three different values to every method above. Cleaning helps with some: TRIM removes extra spaces, and LOWER removes capital-letter differences. Punctuation and word differences need similarity matching, not formulas. A practical order is to clean first with TRIM and LOWER in a helper column, remove exact duplicates from that column, and only then review what is left by eye or with a similarity score.</p>
+<h2>Related jobs</h2>
+<ul><li>Duplicates defined by several columns together: <a href="/remove-duplicates-google-sheets-multiple-columns">Remove Duplicates in Google Sheets by Multiple Columns</a></li><li>Keep the most recent row, not the first: <a href="/remove-duplicates-keep-latest-google-sheets">Remove Duplicates and Keep the Latest in Google Sheets</a></li><li>Count how many times each value repeats: <a href="/count-duplicates-google-sheets">How to Count Duplicates in Google Sheets (COUNTIF, QUERY)</a></li><li>Merge duplicate rows and add up their amounts: <a href="/merge-duplicate-rows-sum-google-sheets">Merge Duplicate Rows and Sum Values in Google Sheets</a></li><li>Highlight instead of delete: <a href="/highlight-duplicates-google-sheets">How to Highlight Duplicates in Google Sheets (Formulas)</a></li></ul>
+<h2>Which should you use?</h2>
+<ul><li>One-off cleanup of a copy: Way 1.</li><li>A live, clean list that updates: Way 2.</li><li>You need to review before deleting: Way 3 or Way 4.</li><li>Different spellings of the same thing: Way 5.</li></ul>
+<h2>When an add-on or script pack helps</h2>
+<p>Disclosure: Snakbacks, the publisher of this site, sells a paid script pack and makes two free add-ons for Google Sheets.</p>
+<p>For near-duplicates such as spelling variants and typos, the Fuzzy Match Template for Google Sheets (US$9, no add-on install): <a href="https://snakback.gumroad.com/l/fuzzy-formulas">snakback.gumroad.com/l/fuzzy-formulas</a> adds FUZZYSCORE(a, b) to score how similar two values are, pasted into your sheet once, with a 30-day refund if it does not help. Ways 1 to 4 need nothing but Google Sheets itself.</p>
+<p>Our free add-on Fuzzy Match is now on the Google Workspace Marketplace: <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Fuzzy Match on the Marketplace</a>. Duplicate Remover is now on the Marketplace too: <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Duplicate Remover on the Marketplace</a>.</p>
+<p>Tip: after installing, open Extensions &gt; Fuzzy Match &gt; How to use once in each new spreadsheet. Until you do, its formulas can show #NAME?.</p>
+<p>Need to catch near-duplicates that exact formulas miss, such as &quot;Acme Pty Ltd&quot; and &quot;ACME Pty. Ltd&quot;? The Data Cleanup Kit for Google Sheets (US$15, no add-on install) groups them for you with FUZZYDUPES, and adds ready-made tabs for merging and summing, keeping the latest row, comparing lists, splitting names and cleaning text: <a href="https://snakback.gumroad.com/l/data-cleanup-kit">snakback.gumroad.com/l/data-cleanup-kit</a></p>
+<p>Snakbacks publishes the Duplicate Remover and Fuzzy Match add-ons.</p>
+<aside class="callout dedupe" aria-label="Free add-on"><img src="/assets/dedupe-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Duplicate Remover</span> <span class="tag">Free add-on</span></p>
+<p>Highlight duplicate rows, add a "Duplicate?" column, or copy the repeats to a new sheet, from the Extensions menu. No sidebar and no formulas to write.</p>
+<p><a href="/duplicate-remover">About Duplicate Remover</a> &middot; <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Get it on the Marketplace</a></p></div></aside>
+<div class="related"><h2 style="font-size:1.2rem;margin-top:0">More duplicates guides</h2><ul class="guide-list"><li><a href="/remove-duplicates-google-sheets-multiple-columns">Remove Duplicates in Google Sheets by Multiple Columns</a></li><li><a href="/remove-duplicates-keep-latest-google-sheets">Remove Duplicates and Keep the Latest in Google Sheets</a></li><li><a href="/highlight-duplicates-google-sheets">How to Highlight Duplicates in Google Sheets (Formulas)</a></li><li><a href="/count-duplicates-google-sheets">How to Count Duplicates in Google Sheets (COUNTIF, QUERY)</a></li></ul><p><a href="/guides">All guides</a></p></div>
+</article></div>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div class="foot-grid">
+<div><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<p class="muted">A small Australian studio making Google Sheets add-ons.</p>
+<p>info@snakbacks.com<br>PO Box 1400, Burpengary D.C. QLD 4505, Australia</p></div>
+<div><h2>Products</h2><ul>
+<li><a href="/fuzzy-match">Fuzzy Match</a></li><li><a href="/duplicate-remover">Duplicate Remover</a></li><li><a href="/pro">Snakbacks Pro</a></li></ul></div>
+<div><h2>Resources</h2><ul>
+<li><a href="/guides">Guides</a></li><li><a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a></li><li><a href="https://snakback.gumroad.com/l/data-cleanup-kit">Data Cleanup Kit</a></li><li><a href="https://snakback.gumroad.com/l/levenshtein-starter">Levenshtein starter (free)</a></li></ul></div>
+<div><h2>Studio</h2><ul>
+<li><a href="/about">About</a></li><li><a href="/takeover">Add-on takeover</a></li><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="mailto:info@snakbacks.com">Contact</a></li></ul></div>
+</div>
+<p class="fine">Google Sheets, Google Workspace and Google Workspace Marketplace are trademarks of Google LLC. Snakbacks is not affiliated with or endorsed by Google. No tracking or analytics on this site.</p>
+</div></footer>
+</body>
+</html>

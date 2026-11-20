@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Levenshtein Distance in Google Sheets (Formula, No Script) | Snakbacks</title>
+<meta name="description" content="Levenshtein distance counts the single-character edits (insert, delete or replace) needed to turn one text into another. &quot;John Smith&quot; and &quot;Jon Smith&quot; are...">
+<link rel="canonical" href="https://www.snakbacks.com/levenshtein-distance-google-sheets">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1a5fa0">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Snakbacks">
+<meta property="og:title" content="Levenshtein Distance in Google Sheets (Formula, No Script) | Snakbacks">
+<meta property="og:description" content="Levenshtein distance counts the single-character edits (insert, delete or replace) needed to turn one text into another. &quot;John Smith&quot; and &quot;Jon Smith&quot; are...">
+<meta property="og:url" content="https://www.snakbacks.com/levenshtein-distance-google-sheets">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Levenshtein Distance in Google Sheets (Formula, No Script)","author":{"@type":"Organization","name":"Snakbacks"},"publisher":{"@type":"Organization","name":"Snakbacks"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<nav aria-label="Main"><ul class="nav">
+<li><a href="/#products">Products</a></li>
+<li><a href="/guides" aria-current="page">Guides</a></li>
+<li><a href="/pro">Pro</a></li>
+<li><a href="/takeover">Takeover</a></li>
+<li><a href="/about">About</a></li>
+</ul></nav>
+</div></header>
+<main id="main">
+<div class="wrap"><article class="page-head prose">
+<p class="crumbs"><a href="/">Home</a> / <a href="/guides">Guides</a> / <a href="/guides#lookups">Lookups and matching</a></p>
+<h1 style="font-size:clamp(1.8rem,5vw,2.6rem)">Levenshtein Distance in Google Sheets (Formula, No Script)</h1>
+<p class="ailine">Written with AI assistance; tested in a real Google Sheet.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<p>Levenshtein distance counts the single-character edits (insert, delete or replace) needed to turn one text into another. &quot;John Smith&quot; and &quot;Jon Smith&quot; are 1 edit apart. It is the standard way to measure how close two spellings are. Google Sheets has no built-in function for it, but LAMBDA, REDUCE and SCAN make a pure formula possible, with no Apps Script. This page gives the formula, turns it into a 0 to 1 similarity score, saves it as a reusable named function, and uses it to find the closest match in a list.</p>
+<h2>The sample data</h2>
+<p>Row 1 holds headers. Pairs in A2:B7:</p>
+<ul><li>kitten, sitting</li><li>John Smith, Jon Smith</li><li>Acme Pty Ltd, ACME Pty. Ltd</li><li>Initech, Initech</li><li>Globex, Globex Corporation</li><li>(blank), abc</li></ul>
+<h2>The formula</h2>
+<p>In C2:</p>
+<pre><code>=LET(a,LOWER(A2),b,LOWER(B2),m,LEN(a),n,LEN(b),IF(m=0,n,IF(n=0,m,INDEX(REDUCE(SEQUENCE(1,n+1,0),SEQUENCE(m),LAMBDA(prev,i,SCAN(i,SEQUENCE(1,n+1,0),LAMBDA(left,j,IF(j=0,i,MIN(INDEX(prev,1,j+1)+1,left+1,INDEX(prev,1,j)+(MID(a,i,1)&lt;&gt;MID(b,j,1)))))))),1,n+1))))</code></pre>
+<p>Fill it down. Results: 3, 1, 1, 0, 12, 3. kitten to sitting is the textbook example: replace k with s, replace e with i, add g. LOWER makes it ignore capitals, so &quot;Acme Pty Ltd&quot; and &quot;ACME Pty. Ltd&quot; differ only by the full stop. Remove both LOWER calls if case should count.</p>
+<p>How it works, briefly: the classic method fills a grid with one row per character of the first text. Each cell is the cheapest of three moves: delete (the cell above plus 1), insert (the cell to the left plus 1), or replace (the cell diagonally above-left, plus 1 if the two characters differ). SCAN builds one row from left to right, REDUCE feeds each finished row into the next, and the bottom-right cell is the answer. Only one row is kept at a time, so it stays small.</p>
+<h2>A similarity score from 0 to 1</h2>
+<p>A raw distance is hard to compare across lengths: 3 edits is a lot for a 6-letter word and very little for a 40-character address. Divide by the longer length and subtract from 1. In D2:</p>
+<pre><code>=IF(MAX(LEN(A2),LEN(B2))=0,1,1-C2/MAX(LEN(A2),LEN(B2)))</code></pre>
+<p>Results: 0.571, 0.9, 0.923, 1, 0.333, 0. Format the column as a number with 3 decimals.</p>
+<p>Notice Globex against Globex Corporation: 0.333, although they are clearly the same company. Levenshtein compares characters in order, so extra words cost one edit per letter. Strip suffixes such as Pty Ltd and Corporation before you score company names. Our guide to standardising company names shows a formula for that: <a href="/standardize-company-names-google-sheets">Standardize Company Names in Google Sheets (Clean Key + Mapping Table)</a></p>
+<h2>Save it as a named function</h2>
+<p>The formula is long, so save it once and call it like a built-in function:</p>
+<ol><li>Data &gt; Named functions &gt; Add new function.</li><li>Name: LEVENSHTEIN. Argument placeholders: text1, text2.</li><li>Formula definition: paste the formula from above, with A2 replaced by text1 and B2 by text2.</li><li>Click Next, then Create.</li></ol>
+<p>Now =LEVENSHTEIN(A2,B2) gives the distance. Named functions belong to the spreadsheet; to use one in another file, choose Import function in the same panel.</p>
+<p>Prefer it ready-made? Our free Levenshtein &amp; Similarity Starter is a Google Sheets template with this named function plus a similarity tab and a best-match tab already set up. Enter $0 to get it: <a href="https://snakback.gumroad.com/l/levenshtein-starter">snakback.gumroad.com/l/levenshtein-starter</a></p>
+<h2>Find the closest match in a list</h2>
+<p>Master list in F2:F5: Initech, Umbrella Corp, Acme Pty Ltd, Globex Corporation. Messy names in H2:H4: Acme Pty. Ltd., Globex Corp, Inytech. In I2, using the named function:</p>
+<pre><code>=LET(list,$F$2:$F$5,s,MAP(list,LAMBDA(x,1-LEVENSHTEIN(H2,x)/MAX(LEN(H2),LEN(x)))),HSTACK(XLOOKUP(MAX(s),s,list),MAX(s)))</code></pre>
+<p>Fill down. It returns the best match and its score: Acme Pty Ltd 0.857, Globex Corporation 0.611, Initech 0.857. MAP scores every name in the list and XLOOKUP picks the highest.</p>
+<p>Rank by similarity, not by raw distance. Globex Corp is 7 edits from Globex Corporation, and also 7 from Umbrella Corp, so a smallest-distance lookup returns Umbrella Corp, the first of the tie. Dividing by length breaks the tie the right way: 0.611 against 0.462.</p>
+<p>Then decide on a cut-off. Accept matches above it and check the rest by eye. Be careful with short names: one edit in a 7-letter name still scores 0.857, which is how &quot;Initech&quot; and &quot;Initec&quot; can look like a match when they might be two companies.</p>
+<h2>Limits</h2>
+<ul><li>Speed. Every pair builds a grid of LEN(a) by LEN(b) steps, and the closest-match formula scores every pair. 500 names against a 500-name list is 250,000 pairs, and Sheets will slow to a crawl well before that. The formula suits a few hundred comparisons, not thousands.</li><li>Word order. &quot;Smith, John&quot; and &quot;John Smith&quot; score low, because Levenshtein reads left to right. Sort the words first if order does not matter; our names guide shows how: <a href="/match-names-with-typos-google-sheets">Match Names with Typos in Google Sheets (Fuzzy Name Matching)</a></li><li>Accents count as different characters: &quot;José&quot; against &quot;Jose&quot; is 1 edit.</li></ul>
+<h2>When an add-on or script pack helps</h2>
+<p>Disclosure: Snakbacks, the publisher of this site, sells a paid script pack and makes two free add-ons for Google Sheets.</p>
+<p>The named function above is free and fine for small lists. For thousands of rows, the Fuzzy Match Template for Google Sheets (US$9, no add-on install): <a href="https://snakback.gumroad.com/l/fuzzy-formulas">snakback.gumroad.com/l/fuzzy-formulas</a> gives FUZZYSCORE, FUZZYMATCH and FUZZYLOOKUP as Apps Script functions that take whole columns. In our test, 1,000 names against a 1,000-name list finished in about 15 seconds. Its score also handles reordered words and extra words, so &quot;Globex&quot; against &quot;Globex Corporation&quot; scores 0.867 instead of 0.333, and &quot;Smith, John&quot; against &quot;John Smith&quot; scores 1. There is a 30-day refund if it does not work for you.</p>
+<p>Our free add-on Fuzzy Match is now on the Google Workspace Marketplace: <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Fuzzy Match on the Marketplace</a>. Duplicate Remover is now on the Marketplace too: <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Duplicate Remover on the Marketplace</a>.</p>
+<p>Snakbacks publishes the Duplicate Remover and Fuzzy Match add-ons.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<div class="related"><h2 style="font-size:1.2rem;margin-top:0">More lookups and matching guides</h2><ul class="guide-list"><li><a href="/vlookup-na-error-google-sheets">VLOOKUP Returns #N/A in Google Sheets: Causes and Fixes</a></li><li><a href="/vlookup-partial-match-google-sheets">VLOOKUP Partial Match in Google Sheets (Wildcards, Contains)</a></li><li><a href="/xlookup-google-sheets">XLOOKUP in Google Sheets: Syntax, Wildcards and Examples</a></li><li><a href="/index-match-google-sheets">INDEX MATCH in Google Sheets: Syntax, Examples, vs VLOOKUP</a></li></ul><p><a href="/guides">All guides</a></p></div>
+</article></div>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div class="foot-grid">
+<div><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<p class="muted">A small Australian studio making Google Sheets add-ons.</p>
+<p>info@snakbacks.com<br>PO Box 1400, Burpengary D.C. QLD 4505, Australia</p></div>
+<div><h2>Products</h2><ul>
+<li><a href="/fuzzy-match">Fuzzy Match</a></li><li><a href="/duplicate-remover">Duplicate Remover</a></li><li><a href="/pro">Snakbacks Pro</a></li></ul></div>
+<div><h2>Resources</h2><ul>
+<li><a href="/guides">Guides</a></li><li><a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a></li><li><a href="https://snakback.gumroad.com/l/data-cleanup-kit">Data Cleanup Kit</a></li><li><a href="https://snakback.gumroad.com/l/levenshtein-starter">Levenshtein starter (free)</a></li></ul></div>
+<div><h2>Studio</h2><ul>
+<li><a href="/about">About</a></li><li><a href="/takeover">Add-on takeover</a></li><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="mailto:info@snakbacks.com">Contact</a></li></ul></div>
+</div>
+<p class="fine">Google Sheets, Google Workspace and Google Workspace Marketplace are trademarks of Google LLC. Snakbacks is not affiliated with or endorsed by Google. No tracking or analytics on this site.</p>
+</div></footer>
+</body>
+</html>

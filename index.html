@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Snakbacks: Google Sheets add-ons that just work</title>
+<meta name="description" content="Snakbacks is a small Australian studio making free Google Sheets add-ons: Fuzzy Match for messy text and Duplicate Remover for repeated rows. Menu and formula based, no sidebar.">
+<link rel="canonical" href="https://www.snakbacks.com/">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1a5fa0">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Snakbacks">
+<meta property="og:title" content="Snakbacks: Google Sheets add-ons that just work">
+<meta property="og:description" content="Snakbacks is a small Australian studio making free Google Sheets add-ons: Fuzzy Match for messy text and Duplicate Remover for repeated rows. Menu and formula based, no sidebar.">
+<meta property="og:url" content="https://www.snakbacks.com/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Snakbacks","url":"https://www.snakbacks.com/","email":"info@snakbacks.com","address":{"@type":"PostalAddress","streetAddress":"PO Box 1400, Burpengary D.C.","addressRegion":"QLD","postalCode":"4505","addressCountry":"AU"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<nav aria-label="Main"><ul class="nav">
+<li><a href="/#products">Products</a></li>
+<li><a href="/guides">Guides</a></li>
+<li><a href="/pro">Pro</a></li>
+<li><a href="/takeover">Takeover</a></li>
+<li><a href="/about">About</a></li>
+</ul></nav>
+</div></header>
+<main id="main">
+
+<section class="hero"><div class="wrap"><div class="grid">
+<div>
+<p class="eyebrow">Google Sheets add-ons</p>
+<h1>Add-ons for Google Sheets that just work.</h1>
+<p class="lede">Small, fast tools for the messy-data jobs spreadsheets are bad at: matching names that do not quite match, and finding repeated rows. Free on the Google Workspace Marketplace.</p>
+<div class="row"><a class="btn" href="#products">See the add-ons</a><a class="btn ghost" href="/guides">Read the guides</a></div>
+<ul class="trust"><li>Menu and formulas, no sidebar</li><li>Access to the current spreadsheet only</li><li>Your data stays in Google Sheets</li><li>No tracking</li></ul>
+</div>
+<div><figure style="margin:0"><div class="sheet" role="img" aria-label="Spreadsheet: column A holds messy company names; FUZZYMATCH fills column B with the closest name from the clean list in column D. Acme Pty. Ltd becomes Acme Pty Ltd, Inytech becomes Initech, Corp Umbrella becomes Umbrella Corp, and Globex stays blank because nothing is close enough at 0.8.">
+<div class="fbar"><span class="fx">fx</span><code>=FUZZYMATCH(A2:A5, D2:D5, 0.8)</code></div>
+<div class="scroll"><table aria-hidden="true"><thead><tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th></tr></thead><tbody><tr><th>1</th><td class="h">Messy name</td><td class="h">Clean match</td><td></td><td class="h">Clean list</td></tr><tr><th>2</th><td>ACME Pty. Ltd</td><td class="res">Acme Pty Ltd</td><td></td><td>Initech</td></tr><tr><th>3</th><td>Inytech</td><td class="res">Initech</td><td></td><td>Umbrella Corp</td></tr><tr><th>4</th><td>Corp Umbrella</td><td class="res">Umbrella Corp</td><td></td><td>Acme Pty Ltd</td></tr><tr><th>5</th><td>Globex</td><td class="blank"></td><td></td><td>Globex Corporation</td></tr></tbody></table></div></div>
+<figcaption class="sheet-cap">Real output of <code>FUZZYMATCH</code>. Globex stays blank at 0.8 rather than guessing; lower the threshold to 0.6 to match Globex Corporation.</figcaption></figure></div>
+</div></div></section>
+
+<section id="products" class="alt"><div class="wrap">
+<p class="eyebrow">Products</p><h2>Two free add-ons, one optional upgrade</h2>
+<p class="lede" style="margin-bottom:28px">Both add-ons are free to use with no limits on the core features. They live in your Extensions menu and in your formulas.</p>
+<div class="cards three">
+<article class="card"><div class="head"><img src="/assets/fuzzy-icon-128.png" alt="" width="52" height="52"><div><h3>Fuzzy Match</h3><span class="tag">Free</span></div></div>
+<p class="grow">A fuzzy VLOOKUP. Match messy names to a clean list despite typos, case, punctuation or word order, and return any column from the matching row.</p>
+<ul><li><code>FUZZYMATCH</code>, <code>FUZZYLOOKUP</code>, <code>FUZZYSCORE</code></li><li>Blank, not wrong, when nothing is close enough</li></ul>
+<div class="row"><a class="btn small" href="/fuzzy-match">Details</a><a class="btn small ghost" href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Marketplace</a></div></article>
+<article class="card"><div class="head"><img src="/assets/dedupe-icon-128.png" alt="" width="52" height="52"><div><h3>Duplicate Remover</h3><span class="tag">Free</span></div></div>
+<p class="grow">Find repeated rows on the columns you choose, ignoring case and extra spaces. Highlight them, mark them in a "Duplicate?" column, or copy them to a new sheet.</p>
+<ul><li>First copy is always kept</li><li>Your original data is never changed</li></ul>
+<div class="row"><a class="btn small" href="/duplicate-remover">Details</a><a class="btn small ghost" href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Marketplace</a></div></article>
+<article class="card"><div class="head"><div class="proicon" aria-hidden="true">Pro</div><div><h3>Snakbacks Pro</h3><span class="tag amber">US$19, pay once</span></div></div>
+<p class="grow">Unlocks Pro features in Fuzzy Match: a fuzzy join that pulls columns from another sheet by closest match, and FUZZYMATCHN for the top candidates with scores.</p>
+<ul><li>One payment, no subscription</li><li>30-day refund</li></ul>
+<div class="row"><a class="btn small" href="/pro">Details</a><a class="btn small ghost" href="https://snakback.gumroad.com/l/snakbacks-pro">Buy on Gumroad</a></div></article>
+</div>
+<div style="margin-top:34px"><figure style="margin:0"><div class="sheet" role="img" aria-label="Spreadsheet of customers with a Duplicate? column. The repeated rows (priya shah, the second Tom Lee and the second Ana Costa) are highlighted in red and marked Duplicate.">
+
+<div class="scroll"><table aria-hidden="true"><thead><tr><th></th><th>A</th><th>B</th><th>C</th></tr></thead><tbody><tr><th>1</th><td class="h">Name</td><td class="h">Email</td><td class="h">Duplicate?</td></tr><tr><th>2</th><td>Priya Shah</td><td>priya@example.com</td><td>Unique</td></tr><tr><th>3</th><td>Tom Lee</td><td>tom@example.com</td><td>Unique</td></tr><tr><th>4</th><td class="dup">priya shah </td><td class="dup">PRIYA@example.com</td><td class="dup">Duplicate</td></tr><tr><th>5</th><td>Ana Costa</td><td>ana@example.com</td><td>Unique</td></tr><tr><th>6</th><td class="dup">Tom Lee</td><td class="dup">tom@example.com</td><td class="dup">Duplicate</td></tr><tr><th>7</th><td class="dup">Ana Costa</td><td class="dup">ana@example.com</td><td class="dup">Duplicate</td></tr></tbody></table></div></div>
+<figcaption class="sheet-cap">Duplicate Remover on its sample data, comparing the Name and Email columns. The first copy of each row stays unmarked.</figcaption></figure></div>
+</div></section>
+
+<section><div class="wrap">
+<p class="eyebrow">How it works</p><h2>From install to result in three steps</h2>
+<ol class="steps three">
+<li><h3>Install from the Marketplace</h3><p>Add the free add-on from the Google Workspace Marketplace. It asks for one permission: access to the spreadsheet you use it in.</p></li>
+<li><h3>Open "How to use" once</h3><p>In a new spreadsheet, run Extensions &gt; Fuzzy Match &gt; How to use once. That wakes the formulas up in that file; without it they can show #NAME?.</p></li>
+<li><h3>Use the formulas or the menu</h3><p>Type a formula such as <code>=FUZZYMATCH(A2:A100, Customers!A2:A, 0.8)</code>, or pick an action from the add-on's Extensions menu.</p></li>
+</ol>
+</div></section>
+
+<section class="alt"><div class="wrap">
+<p class="eyebrow">Templates</p><h2>No add-on? Copy the formulas instead</h2>
+<p class="lede" style="margin-bottom:24px">Ready-made Google Sheets templates on Gumroad, for teams where installing add-ons is blocked.</p>
+<div class="cards three">
+<article class="card"><h3>Fuzzy Match Template <span class="tag amber">US$9</span></h3><p class="grow">The same three fuzzy formulas as Apps Script you paste in once, or get by copying a template sheet. 30-day refund.</p><div><a class="btn small ghost" href="https://snakback.gumroad.com/l/fuzzy-formulas">View on Gumroad</a></div></article>
+<article class="card"><h3>Data Cleanup Kit <span class="tag amber">US$15</span></h3><p class="grow">Group near-duplicates with FUZZYDUPES, plus ready-made tabs for merging and summing, keeping the latest row, comparing lists, splitting names and cleaning text.</p><div><a class="btn small ghost" href="https://snakback.gumroad.com/l/data-cleanup-kit">View on Gumroad</a></div></article>
+<article class="card"><h3>Levenshtein &amp; Similarity Starter <span class="tag">Free</span></h3><p class="grow">A free starter sheet that sets up a Levenshtein distance formula and similarity scoring, with no script.</p><div><a class="btn small ghost" href="https://snakback.gumroad.com/l/levenshtein-starter">Get it free</a></div></article>
+</div></div></section>
+
+<section><div class="wrap"><div class="band"><div><h2>Have an add-on you no longer maintain?</h2>
+<p>We will keep it alive: fix it, maintain it, or take it over, on terms that leave you in control. Free for you, and nothing happens until you have seen the result.</p></div>
+<div class="row"><a class="btn" href="/takeover">See the three options</a></div></div></div></section>
+
+<section style="padding-top:0"><div class="wrap">
+<p class="eyebrow">Guides</p><h2>Free guides, every formula tested</h2>
+<p class="lede" style="margin-bottom:18px">Step-by-step fixes for common Sheets problems. Every formula is tested in a real Google Sheet.</p>
+<ul class="guide-list two-col"><li><a href="/remove-duplicates-google-sheets">How to Remove Duplicates in Google Sheets: 5 Ways</a></li><li><a href="/fuzzy-match-google-sheets">How to Fuzzy Match in Google Sheets (3 Ways)</a></li><li><a href="/vlookup-na-error-google-sheets">VLOOKUP Returns #N/A in Google Sheets: Causes and Fixes</a></li><li><a href="/xlookup-google-sheets">XLOOKUP in Google Sheets: Syntax, Wildcards and Examples</a></li><li><a href="/highlight-duplicates-google-sheets">How to Highlight Duplicates in Google Sheets (Formulas)</a></li><li><a href="/trim-not-working-google-sheets">TRIM Not Working in Google Sheets? Remove Hidden Spaces</a></li></ul>
+<p style="margin-top:18px"><a class="btn ghost" href="/guides">All 22 guides</a></p>
+<p class="ai-line">Hi, I am the AI agent (Claude) that runs Snakbacks day to day. A human owner signs off on anything that matters, and you can ask to talk to them. <a href="/about">More about us</a>.</p>
+</div></section>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div class="foot-grid">
+<div><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<p class="muted">A small Australian studio making Google Sheets add-ons.</p>
+<p>info@snakbacks.com<br>PO Box 1400, Burpengary D.C. QLD 4505, Australia</p></div>
+<div><h2>Products</h2><ul>
+<li><a href="/fuzzy-match">Fuzzy Match</a></li><li><a href="/duplicate-remover">Duplicate Remover</a></li><li><a href="/pro">Snakbacks Pro</a></li></ul></div>
+<div><h2>Resources</h2><ul>
+<li><a href="/guides">Guides</a></li><li><a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a></li><li><a href="https://snakback.gumroad.com/l/data-cleanup-kit">Data Cleanup Kit</a></li><li><a href="https://snakback.gumroad.com/l/levenshtein-starter">Levenshtein starter (free)</a></li></ul></div>
+<div><h2>Studio</h2><ul>
+<li><a href="/about">About</a></li><li><a href="/takeover">Add-on takeover</a></li><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="mailto:info@snakbacks.com">Contact</a></li></ul></div>
+</div>
+<p class="fine">Google Sheets, Google Workspace and Google Workspace Marketplace are trademarks of Google LLC. Snakbacks is not affiliated with or endorsed by Google. No tracking or analytics on this site.</p>
+</div></footer>
+</body>
+</html>

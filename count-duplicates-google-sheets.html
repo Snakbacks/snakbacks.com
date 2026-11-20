@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How to Count Duplicates in Google Sheets (COUNTIF, QUERY) | Snakbacks</title>
+<meta name="description" content="&quot;Count duplicates&quot; can mean four different things in Google Sheets: how many times each value appears, how many rows are repeats, how many different...">
+<link rel="canonical" href="https://www.snakbacks.com/count-duplicates-google-sheets">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1a5fa0">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Snakbacks">
+<meta property="og:title" content="How to Count Duplicates in Google Sheets (COUNTIF, QUERY) | Snakbacks">
+<meta property="og:description" content="&quot;Count duplicates&quot; can mean four different things in Google Sheets: how many times each value appears, how many rows are repeats, how many different...">
+<meta property="og:url" content="https://www.snakbacks.com/count-duplicates-google-sheets">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"How to Count Duplicates in Google Sheets (COUNTIF, QUERY)","author":{"@type":"Organization","name":"Snakbacks"},"publisher":{"@type":"Organization","name":"Snakbacks"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<nav aria-label="Main"><ul class="nav">
+<li><a href="/#products">Products</a></li>
+<li><a href="/guides" aria-current="page">Guides</a></li>
+<li><a href="/pro">Pro</a></li>
+<li><a href="/takeover">Takeover</a></li>
+<li><a href="/about">About</a></li>
+</ul></nav>
+</div></header>
+<main id="main">
+<div class="wrap"><article class="page-head prose">
+<p class="crumbs"><a href="/">Home</a> / <a href="/guides">Guides</a> / <a href="/guides#duplicates">Duplicates</a></p>
+<h1 style="font-size:clamp(1.8rem,5vw,2.6rem)">How to Count Duplicates in Google Sheets (COUNTIF, QUERY)</h1>
+<p class="ailine">Written with AI assistance; tested in a real Google Sheet.</p>
+<aside class="callout dedupe" aria-label="Free add-on"><img src="/assets/dedupe-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Duplicate Remover</span> <span class="tag">Free add-on</span></p>
+<p>Highlight duplicate rows, add a "Duplicate?" column, or copy the repeats to a new sheet, from the Extensions menu. No sidebar and no formulas to write.</p>
+<p><a href="/duplicate-remover">About Duplicate Remover</a> &middot; <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Get it on the Marketplace</a></p></div></aside>
+<p>&quot;Count duplicates&quot; can mean four different things in Google Sheets: how many times each value appears, how many rows are repeats, how many different values there are, or a full frequency table. This page gives a formula for each, then the versions for several columns.</p>
+<h2>The sample data</h2>
+<p>Header in row 1, items in A2:A7: Apple, Banana, Apple, Cherry, Banana, Date. COUNTIF ignores case, so &quot;apple&quot; would be counted as &quot;Apple&quot;.</p>
+<h2>Count per value</h2>
+<p>In B2, fill down:</p>
+<pre><code>=IF(A2=&quot;&quot;,&quot;&quot;,COUNTIF($A$2:$A$100,A2))</code></pre>
+<p>B2:B7 gives 2, 2, 2, 1, 2, 1. Each row shows how many times its value appears in the whole list, including itself.</p>
+<p>For a running count, where the first copy is 1 and the next is 2:</p>
+<pre><code>=IF(A2=&quot;&quot;,&quot;&quot;,COUNTIF($A$2:A2,A2))</code></pre>
+<p>B2:B7 gives 1, 1, 2, 1, 2, 1. Anything above 1 is a repeat, so you can filter on it.</p>
+<p>To count one specific value, use =COUNTIF(A2:A7,&quot;Banana&quot;), which gives 2.</p>
+<h2>How many duplicate rows</h2>
+<p>This depends on whether you count the first copy.</p>
+<p>Extra copies, meaning the rows you would delete to keep one of each:</p>
+<pre><code>=COUNTA(A2:A7)-COUNTUNIQUE(A2:A7)</code></pre>
+<p>Result: 2 (the second Apple and the second Banana).</p>
+<p>Every row that has a twin, first copies included:</p>
+<pre><code>=SUMPRODUCT(--(COUNTIF(A2:A7,A2:A7)&gt;1))</code></pre>
+<p>Result: 4 (both Apples and both Bananas). Use the exact data range here, not A2:A100, so empty cells stay out of the count.</p>
+<h2>How many unique values</h2>
+<pre><code>=COUNTUNIQUE(A2:A7)</code></pre>
+<p>Result: 4 (Apple, Banana, Cherry, Date). Each different value counts once.</p>
+<p>Values that appear exactly once:</p>
+<pre><code>=SUMPRODUCT(--(COUNTIF(A2:A7,A2:A7)=1))</code></pre>
+<p>Result: 2 (Cherry and Date). The number of different values that repeat is then the first result minus the second:</p>
+<pre><code>=COUNTUNIQUE(A2:A7)-SUMPRODUCT(--(COUNTIF(A2:A7,A2:A7)=1))</code></pre>
+<p>Result: 2 (Apple and Banana).</p>
+<h2>A frequency table</h2>
+<p>Put &quot;Fruit&quot; in A1 so the data is A1:A7. In D1:</p>
+<pre><code>=QUERY(A1:A7,&quot;select A, count(A) where A is not null group by A label count(A) 'Count'&quot;,1)</code></pre>
+<p>Result: a header row Fruit, Count, then Apple 2, Banana 2, Cherry 1, Date 1.</p>
+<p>To list the most frequent first, add an order clause (it goes before label):</p>
+<pre><code>=QUERY(A1:A7,&quot;select A, count(A) where A is not null group by A order by count(A) desc, A label count(A) 'Count'&quot;,1)</code></pre>
+<p>To show only the values that repeat, QUERY has no HAVING clause, so wrap one QUERY in another:</p>
+<pre><code>=QUERY(QUERY(A1:A7,&quot;select A, count(A) where A is not null group by A label count(A) 'Count'&quot;,1),&quot;select * where Col2 &gt; 1&quot;,1)</code></pre>
+<p>Result: Fruit, Count, Apple 2, Banana 2.</p>
+<h3>Without QUERY: UNIQUE plus COUNTIF</h3>
+<p>In D2:</p>
+<pre><code>=UNIQUE(A2:A7)</code></pre>
+<p>In E2:</p>
+<pre><code>=ARRAYFORMULA(IF(D2:D=&quot;&quot;,&quot;&quot;,COUNTIF($A$2:$A$7,D2:D)))</code></pre>
+<p>D2:D5 shows Apple, Banana, Cherry, Date and E2:E5 shows 2, 2, 1, 1. Leave the cells below D2 empty, because UNIQUE fills them.</p>
+<h2>Several columns</h2>
+<p>Sample in A1:B5 (Name, City): Priya Sydney; Tom Perth; Priya Sydney; Priya Melbourne.</p>
+<p>Count of each combination, in C2 filled down:</p>
+<pre><code>=IF(A2=&quot;&quot;,&quot;&quot;,COUNTIFS($A$2:$A$100,A2,$B$2:$B$100,B2))</code></pre>
+<p>C2:C5 gives 2, 1, 2, 1. Priya in Melbourne is a different row from Priya in Sydney.</p>
+<p>Rows that have a twin:</p>
+<pre><code>=SUMPRODUCT(--(COUNTIFS(A2:A5,A2:A5,B2:B5,B2:B5)&gt;1))</code></pre>
+<p>Result: 2.</p>
+<p>Different combinations:</p>
+<pre><code>=SUMPRODUCT(1/COUNTIFS(A2:A5,A2:A5,B2:B5,B2:B5))</code></pre>
+<p>Result: 3, so there is 1 extra copy (4 rows minus 3). Use exact ranges, because a blank row would break the division.</p>
+<p>A frequency table of combinations:</p>
+<pre><code>=QUERY(A1:B5,&quot;select A, B, count(A) where A is not null group by A, B label count(A) 'Count'&quot;,1)</code></pre>
+<p>Result: Priya Melbourne 1, Priya Sydney 2, Tom Perth 1.</p>
+<p>Counting one value anywhere in a block works with a two-column range: =COUNTIF(A2:B5,&quot;Priya&quot;) gives 3. Be careful with COUNTUNIQUE on two columns. It counts different cell values across both columns (here 5: Priya, Sydney, Tom, Perth, Melbourne), not different rows. Use the COUNTIFS version above for rows.</p>
+<h2>Why a count looks wrong</h2>
+<ul><li>Extra spaces. &quot;Date &quot; and &quot;Date&quot; are different. Use Data &gt; Data cleanup &gt; Trim whitespace first.</li><li>Numbers stored as text. &quot;1001&quot; typed as text does not match the number 1001.</li><li>Case. COUNTIF treats Apple and apple as the same. If you need them separate, use SUMPRODUCT(--EXACT(range,A2)).</li><li>A range that stops too early. If your data goes past row 100, widen it.</li><li>Spelling differences. &quot;Jon Smith&quot; and &quot;John Smith&quot; are different values, so these formulas count them separately.</li></ul>
+<h2>When an add-on or script pack helps</h2>
+<p>Disclosure: Snakbacks, the publisher of this site, sells a paid script pack and makes two free add-ons for Google Sheets.</p>
+<p>Counting needs exact matches, and the formulas above are all most people need. If your list has the same name spelled several ways, Fuzzy Match Template for Google Sheets (US$9, no add-on install): <a href="https://snakback.gumroad.com/l/fuzzy-formulas">snakback.gumroad.com/l/fuzzy-formulas</a> can group near-matches first, but it will not change anything for clean data.</p>
+<p>Duplicate Remover for Google Sheets™, our free add-on, is on the Google Workspace Marketplace: <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Duplicate Remover on the Marketplace</a>.</p>
+<p>Need to catch near-duplicates that exact formulas miss, such as &quot;Acme Pty Ltd&quot; and &quot;ACME Pty. Ltd&quot;? The Data Cleanup Kit for Google Sheets (US$15, no add-on install) groups them for you with FUZZYDUPES, and adds ready-made tabs for merging and summing, keeping the latest row, comparing lists, splitting names and cleaning text: <a href="https://snakback.gumroad.com/l/data-cleanup-kit">snakback.gumroad.com/l/data-cleanup-kit</a></p>
+<p>Snakbacks publishes the Duplicate Remover and Fuzzy Match add-ons.</p>
+<aside class="callout dedupe" aria-label="Free add-on"><img src="/assets/dedupe-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Duplicate Remover</span> <span class="tag">Free add-on</span></p>
+<p>Highlight duplicate rows, add a "Duplicate?" column, or copy the repeats to a new sheet, from the Extensions menu. No sidebar and no formulas to write.</p>
+<p><a href="/duplicate-remover">About Duplicate Remover</a> &middot; <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Get it on the Marketplace</a></p></div></aside>
+<div class="related"><h2 style="font-size:1.2rem;margin-top:0">More duplicates guides</h2><ul class="guide-list"><li><a href="/remove-duplicates-google-sheets">How to Remove Duplicates in Google Sheets: 5 Ways</a></li><li><a href="/remove-duplicates-google-sheets-multiple-columns">Remove Duplicates in Google Sheets by Multiple Columns</a></li><li><a href="/remove-duplicates-keep-latest-google-sheets">Remove Duplicates and Keep the Latest in Google Sheets</a></li><li><a href="/highlight-duplicates-google-sheets">How to Highlight Duplicates in Google Sheets (Formulas)</a></li></ul><p><a href="/guides">All guides</a></p></div>
+</article></div>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div class="foot-grid">
+<div><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<p class="muted">A small Australian studio making Google Sheets add-ons.</p>
+<p>info@snakbacks.com<br>PO Box 1400, Burpengary D.C. QLD 4505, Australia</p></div>
+<div><h2>Products</h2><ul>
+<li><a href="/fuzzy-match">Fuzzy Match</a></li><li><a href="/duplicate-remover">Duplicate Remover</a></li><li><a href="/pro">Snakbacks Pro</a></li></ul></div>
+<div><h2>Resources</h2><ul>
+<li><a href="/guides">Guides</a></li><li><a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a></li><li><a href="https://snakback.gumroad.com/l/data-cleanup-kit">Data Cleanup Kit</a></li><li><a href="https://snakback.gumroad.com/l/levenshtein-starter">Levenshtein starter (free)</a></li></ul></div>
+<div><h2>Studio</h2><ul>
+<li><a href="/about">About</a></li><li><a href="/takeover">Add-on takeover</a></li><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="mailto:info@snakbacks.com">Contact</a></li></ul></div>
+</div>
+<p class="fine">Google Sheets, Google Workspace and Google Workspace Marketplace are trademarks of Google LLC. Snakbacks is not affiliated with or endorsed by Google. No tracking or analytics on this site.</p>
+</div></footer>
+</body>
+</html>

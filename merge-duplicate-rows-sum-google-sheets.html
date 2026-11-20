@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Merge Duplicate Rows and Sum Values in Google Sheets | Snakbacks</title>
+<meta name="description" content="Data &gt; Data cleanup &gt; Remove duplicates deletes repeated rows, but it does not add their numbers together. To combine duplicate rows into one and sum the...">
+<link rel="canonical" href="https://www.snakbacks.com/merge-duplicate-rows-sum-google-sheets">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1a5fa0">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Snakbacks">
+<meta property="og:title" content="Merge Duplicate Rows and Sum Values in Google Sheets | Snakbacks">
+<meta property="og:description" content="Data &gt; Data cleanup &gt; Remove duplicates deletes repeated rows, but it does not add their numbers together. To combine duplicate rows into one and sum the...">
+<meta property="og:url" content="https://www.snakbacks.com/merge-duplicate-rows-sum-google-sheets">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Merge Duplicate Rows and Sum Values in Google Sheets","author":{"@type":"Organization","name":"Snakbacks"},"publisher":{"@type":"Organization","name":"Snakbacks"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<nav aria-label="Main"><ul class="nav">
+<li><a href="/#products">Products</a></li>
+<li><a href="/guides" aria-current="page">Guides</a></li>
+<li><a href="/pro">Pro</a></li>
+<li><a href="/takeover">Takeover</a></li>
+<li><a href="/about">About</a></li>
+</ul></nav>
+</div></header>
+<main id="main">
+<div class="wrap"><article class="page-head prose">
+<p class="crumbs"><a href="/">Home</a> / <a href="/guides">Guides</a> / <a href="/guides#duplicates">Duplicates</a></p>
+<h1 style="font-size:clamp(1.8rem,5vw,2.6rem)">Merge Duplicate Rows and Sum Values in Google Sheets</h1>
+<p class="ailine">Written with AI assistance; tested in a real Google Sheet.</p>
+<aside class="callout dedupe" aria-label="Free add-on"><img src="/assets/dedupe-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Duplicate Remover</span> <span class="tag">Free add-on</span></p>
+<p>Highlight duplicate rows, add a "Duplicate?" column, or copy the repeats to a new sheet, from the Extensions menu. No sidebar and no formulas to write.</p>
+<p><a href="/duplicate-remover">About Duplicate Remover</a> &middot; <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Get it on the Marketplace</a></p></div></aside>
+<p>Data &gt; Data cleanup &gt; Remove duplicates deletes repeated rows, but it does not add their numbers together. To combine duplicate rows into one and sum the amounts, you need a formula. This page shows four ways, from the shortest to the most flexible, and how to decide whether to keep the result live or paste it as values.</p>
+<h2>The sample data</h2>
+<p>Row 1 holds headers. A2:C6 (Customer, Region, Amount):</p>
+<ul><li>Acme, East, 100</li><li>Globex, West, 50</li><li>Acme, East, 25</li><li>Acme, West, 10</li><li>Globex, West, 70</li></ul>
+<p>Wanted result: one row per customer with the total amount.</p>
+<h2>Method 1: QUERY with group by and sum</h2>
+<p>Put this in E1, with the header row included in the range:</p>
+<pre><code>=QUERY(A1:C6,&quot;select A, sum(C) where A is not null group by A label sum(C) 'Total'&quot;,1)</code></pre>
+<p>Result: Customer, Total, then Acme 135 and Globex 120. The columns in select must either be in the group by or be wrapped in an aggregate such as sum, so you cannot select B here without grouping by it. The <code>where A is not null</code> part keeps blank rows out of the result. QUERY updates by itself as you add rows, if your range covers them (for example A1:C1000 instead of A1:C6).</p>
+<h2>Method 2: UNIQUE plus SUMIF</h2>
+<p>This is easier to read and edit if you do not like QUERY syntax. In E2:</p>
+<pre><code>=UNIQUE(A2:A6)</code></pre>
+<p>That lists Acme and Globex. In F2:</p>
+<pre><code>=ARRAYFORMULA(IF(E2:E=&quot;&quot;,&quot;&quot;,SUMIF($A$2:$A$6,E2:E,$C$2:$C$6)))</code></pre>
+<p>F2:F3 gives 135 and 120. If you prefer a plain formula, use =SUMIF($A$2:$A$6,E2,$C$2:$C$6) in F2 and fill it down.</p>
+<h2>Method 3: more than one key column</h2>
+<p>If Acme East and Acme West must stay separate, the key is the Customer and Region pair. List the unique pairs in E2, which fills E2:F4:</p>
+<pre><code>=UNIQUE(A2:B6)</code></pre>
+<p>That returns Acme East, Globex West and Acme West, in order of first appearance. In G2, fill down to G4:</p>
+<pre><code>=SUMIFS($C$2:$C$6,$A$2:$A$6,E2,$B$2:$B$6,F2)</code></pre>
+<p>Results: 125, 120, 10. The QUERY version of the same thing groups by both columns:</p>
+<pre><code>=QUERY(A1:C6,&quot;select A, B, sum(C) where A is not null group by A, B label sum(C) 'Total'&quot;,1)</code></pre>
+<p>Result: Customer, Region, Total, then Acme East 125, Acme West 10, Globex West 120.</p>
+<h2>Method 4: join the text values of duplicates</h2>
+<p>Sometimes you do not want to sum a column but collect it, for example the regions per customer. Using the customer list from Method 2 in E2:E3, put this in G2 and fill down:</p>
+<pre><code>=TEXTJOIN(&quot;, &quot;,TRUE,FILTER($B$2:$B$6,$A$2:$A$6=E2))</code></pre>
+<p>For Acme this gives East, East, West, which keeps repeats. Wrap FILTER in UNIQUE to drop them:</p>
+<pre><code>=TEXTJOIN(&quot;, &quot;,TRUE,UNIQUE(FILTER($B$2:$B$6,$A$2:$A$6=E2)))</code></pre>
+<p>Acme gives East, West and Globex gives West. TRUE tells TEXTJOIN to skip empty values. QUERY cannot join text, so use this method for that job.</p>
+<h2>Keep it live, or paste values?</h2>
+<p>The formulas above are live. When the source data changes, the totals update. That is what you want for a reporting tab. Things to know:</p>
+<ul><li>The result spills into the cells below and to the right. If anything sits in the way, you get a #REF! error saying the array result was not expanded. Clear the cells in its path.</li><li>Leave your source data alone and build the merged result on another tab.</li><li>To freeze the result, select it, copy it, then Edit &gt; Paste special &gt; Values only (Ctrl+Shift+V). The numbers stay, the formulas go, and you can sort or edit them freely. Do this on a copy of the tab if you intend to delete the original rows.</li></ul>
+<h2>Why the totals look wrong</h2>
+<ul><li>Amounts stored as text. SUMIF and QUERY ignore text, so the sum is too small or 0. Check =ISNUMBER(C2), and convert with VALUE or Data &gt; Data cleanup.</li><li>Trailing spaces. &quot;Acme &quot; and &quot;Acme&quot; are separate keys, so you get two rows. Use Data &gt; Data cleanup &gt; Trim whitespace first.</li><li>Spelling variants. &quot;Acme Ltd&quot; and &quot;Acme Limited&quot; are different keys to every formula here.</li><li>Blank rows. UNIQUE over a long range such as A2:A1000 returns one blank entry, which is why Method 2 tests for &quot;&quot;.</li><li>Case. SUMIF and SUMIFS ignore case, so &quot;acme&quot; and &quot;ACME&quot; are summed together.</li></ul>
+<h2>When an add-on or script pack helps</h2>
+<p>Disclosure: Snakbacks, the publisher of this site, sells a paid script pack and makes two free add-ons for Google Sheets.</p>
+<p>Every formula here treats the key as exact; if your duplicates are the same customer spelled differently, the Fuzzy Match Template for Google Sheets (US$9, no add-on install): <a href="https://snakback.gumroad.com/l/fuzzy-formulas">snakback.gumroad.com/l/fuzzy-formulas</a> can score the similarity so you can build a clean key first, and for clean keys you do not need it.</p>
+<p>Our free add-on Fuzzy Match is now on the Google Workspace Marketplace: <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Fuzzy Match on the Marketplace</a>. Duplicate Remover is now on the Marketplace too: <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Duplicate Remover on the Marketplace</a>.</p>
+<p>Need to catch near-duplicates that exact formulas miss, such as &quot;Acme Pty Ltd&quot; and &quot;ACME Pty. Ltd&quot;? The Data Cleanup Kit for Google Sheets (US$15, no add-on install) groups them for you with FUZZYDUPES, and adds ready-made tabs for merging and summing, keeping the latest row, comparing lists, splitting names and cleaning text: <a href="https://snakback.gumroad.com/l/data-cleanup-kit">snakback.gumroad.com/l/data-cleanup-kit</a></p>
+<p>Snakbacks publishes the Duplicate Remover and Fuzzy Match add-ons.</p>
+<aside class="callout dedupe" aria-label="Free add-on"><img src="/assets/dedupe-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Duplicate Remover</span> <span class="tag">Free add-on</span></p>
+<p>Highlight duplicate rows, add a "Duplicate?" column, or copy the repeats to a new sheet, from the Extensions menu. No sidebar and no formulas to write.</p>
+<p><a href="/duplicate-remover">About Duplicate Remover</a> &middot; <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Get it on the Marketplace</a></p></div></aside>
+<div class="related"><h2 style="font-size:1.2rem;margin-top:0">More duplicates guides</h2><ul class="guide-list"><li><a href="/remove-duplicates-google-sheets">How to Remove Duplicates in Google Sheets: 5 Ways</a></li><li><a href="/remove-duplicates-google-sheets-multiple-columns">Remove Duplicates in Google Sheets by Multiple Columns</a></li><li><a href="/remove-duplicates-keep-latest-google-sheets">Remove Duplicates and Keep the Latest in Google Sheets</a></li><li><a href="/highlight-duplicates-google-sheets">How to Highlight Duplicates in Google Sheets (Formulas)</a></li></ul><p><a href="/guides">All guides</a></p></div>
+</article></div>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div class="foot-grid">
+<div><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<p class="muted">A small Australian studio making Google Sheets add-ons.</p>
+<p>info@snakbacks.com<br>PO Box 1400, Burpengary D.C. QLD 4505, Australia</p></div>
+<div><h2>Products</h2><ul>
+<li><a href="/fuzzy-match">Fuzzy Match</a></li><li><a href="/duplicate-remover">Duplicate Remover</a></li><li><a href="/pro">Snakbacks Pro</a></li></ul></div>
+<div><h2>Resources</h2><ul>
+<li><a href="/guides">Guides</a></li><li><a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a></li><li><a href="https://snakback.gumroad.com/l/data-cleanup-kit">Data Cleanup Kit</a></li><li><a href="https://snakback.gumroad.com/l/levenshtein-starter">Levenshtein starter (free)</a></li></ul></div>
+<div><h2>Studio</h2><ul>
+<li><a href="/about">About</a></li><li><a href="/takeover">Add-on takeover</a></li><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="mailto:info@snakbacks.com">Contact</a></li></ul></div>
+</div>
+<p class="fine">Google Sheets, Google Workspace and Google Workspace Marketplace are trademarks of Google LLC. Snakbacks is not affiliated with or endorsed by Google. No tracking or analytics on this site.</p>
+</div></footer>
+</body>
+</html>

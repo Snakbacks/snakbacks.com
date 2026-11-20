@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Standardize Company Names in Google Sheets (Clean Key + Mapping Table) | Snakbacks</title>
+<meta name="description" content="The same company turns up as &quot;Acme Pty Ltd&quot;, &quot;ACME PTY. LTD.&quot; and &quot;The Acme Company&quot;, and every lookup, pivot table and COUNTIF treats them as three...">
+<link rel="canonical" href="https://www.snakbacks.com/standardize-company-names-google-sheets">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1a5fa0">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Snakbacks">
+<meta property="og:title" content="Standardize Company Names in Google Sheets (Clean Key + Mapping Table) | Snakbacks">
+<meta property="og:description" content="The same company turns up as &quot;Acme Pty Ltd&quot;, &quot;ACME PTY. LTD.&quot; and &quot;The Acme Company&quot;, and every lookup, pivot table and COUNTIF treats them as three...">
+<meta property="og:url" content="https://www.snakbacks.com/standardize-company-names-google-sheets">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Standardize Company Names in Google Sheets (Clean Key + Mapping Table)","author":{"@type":"Organization","name":"Snakbacks"},"publisher":{"@type":"Organization","name":"Snakbacks"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<nav aria-label="Main"><ul class="nav">
+<li><a href="/#products">Products</a></li>
+<li><a href="/guides" aria-current="page">Guides</a></li>
+<li><a href="/pro">Pro</a></li>
+<li><a href="/takeover">Takeover</a></li>
+<li><a href="/about">About</a></li>
+</ul></nav>
+</div></header>
+<main id="main">
+<div class="wrap"><article class="page-head prose">
+<p class="crumbs"><a href="/">Home</a> / <a href="/guides">Guides</a> / <a href="/guides#cleanup">Text cleanup</a></p>
+<h1 style="font-size:clamp(1.8rem,5vw,2.6rem)">Standardize Company Names in Google Sheets (Clean Key + Mapping Table)</h1>
+<p class="ailine">Written with AI assistance; tested in a real Google Sheet.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<p>The same company turns up as &quot;Acme Pty Ltd&quot;, &quot;ACME PTY. LTD.&quot; and &quot;The Acme Company&quot;, and every lookup, pivot table and COUNTIF treats them as three customers. This page cleans company names with formulas: a matching key that ignores case, punctuation and legal suffixes, a mapping table that turns every variant into one official name, and a lookup between two lists on that key. It also covers why PROPER is not the fix it looks like.</p>
+<h2>The sample data</h2>
+<p>Row 1 holds headers. Company names in A2:A7:</p>
+<ul><li>Acme Pty Ltd</li><li>ACME PTY. LTD.</li><li>The Acme Company</li><li>Globex Corp.</li><li>globex corporation</li><li>Initech Inc</li></ul>
+<h2>Step 1: a matching key</h2>
+<p>In B2, filled down:</p>
+<pre><code>=IF(A2=&quot;&quot;,&quot;&quot;,TRIM(REGEXREPLACE(REGEXREPLACE(LOWER(SUBSTITUTE(A2,CHAR(160),&quot; &quot;)),&quot;[^a-z0-9 ]&quot;,&quot;&quot;),&quot;\b(pty|ltd|limited|inc|llc|corp|corporation|co|company|the)\b&quot;,&quot;&quot;)))</code></pre>
+<p>The keys are acme, acme, acme, globex, globex, initech. The formula swaps non-breaking spaces (common in pasted data) for normal ones, lower-cases, deletes punctuation, deletes the listed suffix words, and trims the leftover spaces.</p>
+<p>The key is for matching, not for display. Two cautions about the word list:</p>
+<ul><li>Adjust it to your data. Add gmbh, plc, sa or group if you deal with those; remove a word if it is part of real names in your list. &quot;The Company Store&quot; would become just &quot;store&quot;.</li><li>Punctuation is deleted, not replaced with a space, so &quot;Smith&amp;Jones&quot; becomes &quot;smithjones&quot; while &quot;Smith &amp; Jones&quot; becomes &quot;smith jones&quot;. Change the &quot;&quot; in the first REGEXREPLACE to &quot; &quot; if your names glue words together with punctuation.</li></ul>
+<p>To fill the whole column with one formula, put this in B2 instead:</p>
+<pre><code>=ARRAYFORMULA(IF(A2:A=&quot;&quot;,&quot;&quot;,TRIM(REGEXREPLACE(REGEXREPLACE(LOWER(SUBSTITUTE(A2:A,CHAR(160),&quot; &quot;)),&quot;[^a-z0-9 ]&quot;,&quot;&quot;),&quot;\b(pty|ltd|limited|inc|llc|corp|corporation|co|company|the)\b&quot;,&quot;&quot;))))</code></pre>
+<h2>Step 2a: quick standard name, the first spelling seen</h2>
+<p>If any one of the spellings will do, take the first one for each key. In C2:</p>
+<pre><code>=INDEX($A$2:$A$7,MATCH(B2,$B$2:$B$7,0))</code></pre>
+<p>Results: Acme Pty Ltd three times, Globex Corp. twice, Initech Inc. Fast, but the &quot;standard&quot; depends on which row happens to come first.</p>
+<h2>Step 2b: a mapping table with the official names</h2>
+<p>For a name you choose, keep a small table of key and official name. In E2:F4:</p>
+<ul><li>acme, Acme Pty Ltd</li><li>globex, Globex Corporation</li><li>initech, Initech Inc</li></ul>
+<p>Then in D2:</p>
+<pre><code>=IFNA(VLOOKUP(B2,$E$2:$F$4,2,FALSE),A2)</code></pre>
+<p>Results: Acme Pty Ltd three times, Globex Corporation twice, Initech Inc. IFNA keeps the original name when a key is not in the table yet, so new companies are not lost; filter column D against column A to see which ones need adding. The table also handles true aliases that no cleaning can link, such as a trading name and a legal name: add a row for each key.</p>
+<h2>Why not PROPER?</h2>
+<p>=PROPER(A2) capitalises the first letter of each word, so &quot;ACME PTY. LTD.&quot; becomes &quot;Acme Pty. Ltd.&quot; That looks tidy, but it does not make the values match, because the full stops are still there. It also damages names that should stay in capitals: =PROPER(&quot;IBM Australia&quot;) gives &quot;Ibm Australia&quot;. Use the key for matching and the mapping table for display.</p>
+<h2>Look up between two lists on the key</h2>
+<p>Build the same key on the second list, then look up key to key. With the second list's names in H2:H4 (ACME Pty Limited, Globex Corporation, Umbrella Corp) and their keys in I2:I4 (the Step 1 formula, pointed at H), in J2:</p>
+<pre><code>=XLOOKUP(I2,$B$2:$B$7,$D$2:$D$7,&quot;not found&quot;)</code></pre>
+<p>Results: Acme Pty Ltd, Globex Corporation, not found. Umbrella Corp is simply not in the first list. More ways to compare lists are at <a href="/compare-two-columns-duplicates">Compare Two Columns in Google Sheets and Find Duplicates</a></p>
+<h2>What the key cannot fix</h2>
+<p>Typos and abbreviations: &quot;Initech&quot; and &quot;Initek&quot;, or &quot;Intl Business Machines&quot; and &quot;International Business Machines&quot;, produce different keys. For those, score how similar two keys are and review the close ones. The Levenshtein guide has a free named function for that: <a href="/levenshtein-distance-google-sheets">Levenshtein Distance in Google Sheets (Formula, No Script)</a> and the near-duplicates guide applies it to a whole list: <a href="/find-near-duplicates-google-sheets">Find Near-Duplicates in Google Sheets (Similar, Not Identical)</a></p>
+<h2>When an add-on or script pack helps</h2>
+<p>Disclosure: Snakbacks, the publisher of this site, sells a paid script pack and makes two free add-ons for Google Sheets.</p>
+<p>Everything above works with formulas alone. The Data Cleanup Kit for Google Sheets (US$15, no add-on install): <a href="https://snakback.gumroad.com/l/data-cleanup-kit">snakback.gumroad.com/l/data-cleanup-kit</a> has a ready-made clean-text tab that builds a simpler match key (case, spaces and punctuation, without the suffix list), plus FUZZYDUPES to group the variants that differ by typos, and tabs for merging and summing, keeping the latest row, comparing lists and splitting names. If you mainly need to match one list against another despite spelling differences, the Fuzzy Match Template for Google Sheets (US$9): <a href="https://snakback.gumroad.com/l/fuzzy-formulas">snakback.gumroad.com/l/fuzzy-formulas</a> is the smaller option.</p>
+<p>Our free add-on Fuzzy Match is now on the Google Workspace Marketplace: <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Fuzzy Match on the Marketplace</a>. Duplicate Remover is now on the Marketplace too: <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Duplicate Remover on the Marketplace</a>.</p>
+<p>Snakbacks publishes the Duplicate Remover and Fuzzy Match add-ons.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<div class="related"><h2 style="font-size:1.2rem;margin-top:0">More text cleanup guides</h2><ul class="guide-list"><li><a href="/trim-not-working-google-sheets">TRIM Not Working in Google Sheets? Remove Hidden Spaces</a></li><li><a href="/split-full-name-google-sheets">Split First and Last Name in Google Sheets: 4 Methods</a></li></ul><p><a href="/guides">All guides</a></p></div>
+</article></div>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div class="foot-grid">
+<div><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<p class="muted">A small Australian studio making Google Sheets add-ons.</p>
+<p>info@snakbacks.com<br>PO Box 1400, Burpengary D.C. QLD 4505, Australia</p></div>
+<div><h2>Products</h2><ul>
+<li><a href="/fuzzy-match">Fuzzy Match</a></li><li><a href="/duplicate-remover">Duplicate Remover</a></li><li><a href="/pro">Snakbacks Pro</a></li></ul></div>
+<div><h2>Resources</h2><ul>
+<li><a href="/guides">Guides</a></li><li><a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a></li><li><a href="https://snakback.gumroad.com/l/data-cleanup-kit">Data Cleanup Kit</a></li><li><a href="https://snakback.gumroad.com/l/levenshtein-starter">Levenshtein starter (free)</a></li></ul></div>
+<div><h2>Studio</h2><ul>
+<li><a href="/about">About</a></li><li><a href="/takeover">Add-on takeover</a></li><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="mailto:info@snakbacks.com">Contact</a></li></ul></div>
+</div>
+<p class="fine">Google Sheets, Google Workspace and Google Workspace Marketplace are trademarks of Google LLC. Snakbacks is not affiliated with or endorsed by Google. No tracking or analytics on this site.</p>
+</div></footer>
+</body>
+</html>

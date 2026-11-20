@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Split First and Last Name in Google Sheets: 4 Methods | Snakbacks</title>
+<meta name="description" content="A full name in one cell is awkward to sort, mail-merge or match. This page splits names into first, middle and last with the built-in tool and with...">
+<link rel="canonical" href="https://www.snakbacks.com/split-full-name-google-sheets">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1a5fa0">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Snakbacks">
+<meta property="og:title" content="Split First and Last Name in Google Sheets: 4 Methods | Snakbacks">
+<meta property="og:description" content="A full name in one cell is awkward to sort, mail-merge or match. This page splits names into first, middle and last with the built-in tool and with...">
+<meta property="og:url" content="https://www.snakbacks.com/split-full-name-google-sheets">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Split First and Last Name in Google Sheets: 4 Methods","author":{"@type":"Organization","name":"Snakbacks"},"publisher":{"@type":"Organization","name":"Snakbacks"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<nav aria-label="Main"><ul class="nav">
+<li><a href="/#products">Products</a></li>
+<li><a href="/guides" aria-current="page">Guides</a></li>
+<li><a href="/pro">Pro</a></li>
+<li><a href="/takeover">Takeover</a></li>
+<li><a href="/about">About</a></li>
+</ul></nav>
+</div></header>
+<main id="main">
+<div class="wrap"><article class="page-head prose">
+<p class="crumbs"><a href="/">Home</a> / <a href="/guides">Guides</a> / <a href="/guides#cleanup">Text cleanup</a></p>
+<h1 style="font-size:clamp(1.8rem,5vw,2.6rem)">Split First and Last Name in Google Sheets: 4 Methods</h1>
+<p class="ailine">Written with AI assistance; tested in a real Google Sheet.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<p>A full name in one cell is awkward to sort, mail-merge or match. This page splits names into first, middle and last with the built-in tool and with formulas, then handles the cases that break simple splits: &quot;Last, First&quot; order, titles and stray spaces.</p>
+<h2>The sample data</h2>
+<p>Names in A2 down, row 1 holds headers:</p>
+<ul><li>Mary Jane Smith</li><li>John Smith</li><li>Cher</li><li>Smith, John</li><li>Dr. Jane Brown</li></ul>
+<h2>Method 1: Data &gt; Split text to columns</h2>
+<p>Select the column, then choose Data &gt; Split text to columns. A separator box appears; pick Space (or Detect automatically). The names split into columns in place and overwrite whatever is to the right, so insert empty columns first. It is a one-off action: if the source changes, nothing updates. Use a formula when the data keeps changing.</p>
+<h2>Method 2: the SPLIT function</h2>
+<pre><code>=SPLIT(TRIM(A2),&quot; &quot;)</code></pre>
+<p>For Mary Jane Smith this spills three cells: Mary, Jane, Smith. For John Smith it spills two. Rows with different numbers of words give different numbers of cells, so the last name is not always in the same column. That is the reason for the next method. SPLIT drops empty pieces by default, so doubled spaces do not create blank cells, but keep the TRIM, because other functions below do not.</p>
+<h2>Method 3: first name and last name with fixed columns</h2>
+<p>First name:</p>
+<pre><code>=REGEXEXTRACT(TRIM(A2),&quot;^\S+&quot;)</code></pre>
+<p>or without regex:</p>
+<pre><code>=LEFT(TRIM(A2),FIND(&quot; &quot;,TRIM(A2)&amp;&quot; &quot;)-1)</code></pre>
+<p>Both return Mary for Mary Jane Smith, John for John Smith and Cher for Cher. The extra &quot; &quot; added inside FIND stops a one-word name from returning an error.</p>
+<p>Last name is the final word:</p>
+<pre><code>=REGEXEXTRACT(TRIM(A2),&quot;\S+$&quot;)</code></pre>
+<p>This gives Smith, Smith and Cher. A single name counts as both first and last. If you want the last name blank for one-word names, wrap it: =IF(ISERROR(FIND(&quot; &quot;,TRIM(A2))),&quot;&quot;,REGEXEXTRACT(TRIM(A2),&quot;\S+$&quot;)).</p>
+<h2>Middle names</h2>
+<p>With first name in B2 and last name in D2, the middle is whatever remains:</p>
+<pre><code>=TRIM(MID(A2,LEN(B2)+1,LEN(A2)-LEN(B2)-LEN(D2)))</code></pre>
+<p>Mary Jane Smith returns Jane. John Smith returns an empty cell. Several middle names stay together as one string (&quot;Mary Anne Jane Smith&quot; gives &quot;Anne Jane&quot;). This assumes A2 has no extra spaces, so run Method 3 on a cleaned copy.</p>
+<h2>&quot;Last, First&quot; format</h2>
+<p>For &quot;Smith, John&quot;, split on the comma and trim each piece:</p>
+<pre><code>=ARRAYFORMULA(TRIM(SPLIT(A5,&quot;,&quot;)))</code></pre>
+<p>This spills Smith then John. To flip it into a normal &quot;John Smith&quot; in one cell:</p>
+<pre><code>=TRIM(REGEXREPLACE(A5,&quot;^([^,]+),\s*(.*)$&quot;,&quot;$2 $1&quot;))</code></pre>
+<p>This returns John Smith. You can then use Method 3 on the result.</p>
+<h2>Titles</h2>
+<p>Strip a leading title before splitting:</p>
+<pre><code>=TRIM(REGEXREPLACE(A6,&quot;(?i)^(Mr|Mrs|Ms|Miss|Dr|Prof)\.?\s+&quot;,&quot;&quot;))</code></pre>
+<p>Dr. Jane Brown becomes Jane Brown. The \s+ after the title means a name that merely starts with those letters, such as Drew Barry, is left alone. Suffixes such as Jr or III are not handled here; strip them with a similar REGEXREPLACE at the end of the pattern if you have many.</p>
+<h2>Extra spaces</h2>
+<p>Leading, trailing and doubled spaces break LEFT, FIND and MID. TRIM removes all of them, and Data &gt; Data cleanup &gt; Trim whitespace does the same to the cells themselves. Text copied from web pages may contain non-breaking spaces (character 160), which TRIM leaves alone. Swap them first:</p>
+<pre><code>=TRIM(SUBSTITUTE(A2,CHAR(160),&quot; &quot;))</code></pre>
+<h2>Limits worth knowing</h2>
+<ul><li>Compound surnames such as &quot;van der Berg&quot; or &quot;De la Cruz&quot; will come out as just the last word. Check them by hand or keep a small exceptions list.</li><li>Names with only initials (&quot;J. R. Smith&quot;) work, but the first name is &quot;J.&quot;.</li><li>Hyphenated names count as one word.</li><li>No formula can tell which word is the surname in every culture. Treat the output as a first pass and eyeball the odd ones.</li></ul>
+<h2>When an add-on or script pack helps</h2>
+<p>Disclosure: Snakbacks, the publisher of this site, sells a paid script pack and makes two free add-ons for Google Sheets.</p>
+<p>Splitting needs nothing beyond the formulas above. If you later need to match the split names against another list where spelling differs, see <a href="/match-names-with-typos-google-sheets">Match Names with Typos in Google Sheets (Fuzzy Name Matching)</a></p>
+<p>Our free add-on Fuzzy Match is now on the Google Workspace Marketplace: <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Fuzzy Match on the Marketplace</a>. Duplicate Remover is now on the Marketplace too: <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Duplicate Remover on the Marketplace</a>.</p>
+<p>Snakbacks publishes the Duplicate Remover and Fuzzy Match add-ons.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<div class="related"><h2 style="font-size:1.2rem;margin-top:0">More text cleanup guides</h2><ul class="guide-list"><li><a href="/trim-not-working-google-sheets">TRIM Not Working in Google Sheets? Remove Hidden Spaces</a></li><li><a href="/standardize-company-names-google-sheets">Standardize Company Names in Google Sheets (Clean Key + Mapping Table)</a></li></ul><p><a href="/guides">All guides</a></p></div>
+</article></div>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div class="foot-grid">
+<div><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<p class="muted">A small Australian studio making Google Sheets add-ons.</p>
+<p>info@snakbacks.com<br>PO Box 1400, Burpengary D.C. QLD 4505, Australia</p></div>
+<div><h2>Products</h2><ul>
+<li><a href="/fuzzy-match">Fuzzy Match</a></li><li><a href="/duplicate-remover">Duplicate Remover</a></li><li><a href="/pro">Snakbacks Pro</a></li></ul></div>
+<div><h2>Resources</h2><ul>
+<li><a href="/guides">Guides</a></li><li><a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a></li><li><a href="https://snakback.gumroad.com/l/data-cleanup-kit">Data Cleanup Kit</a></li><li><a href="https://snakback.gumroad.com/l/levenshtein-starter">Levenshtein starter (free)</a></li></ul></div>
+<div><h2>Studio</h2><ul>
+<li><a href="/about">About</a></li><li><a href="/takeover">Add-on takeover</a></li><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="mailto:info@snakbacks.com">Contact</a></li></ul></div>
+</div>
+<p class="fine">Google Sheets, Google Workspace and Google Workspace Marketplace are trademarks of Google LLC. Snakbacks is not affiliated with or endorsed by Google. No tracking or analytics on this site.</p>
+</div></footer>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UNIQUE Function in Google Sheets: Multiple Columns, Sorted | Snakbacks</title>
+<meta name="description" content="UNIQUE returns the distinct rows from a range and leaves the original data untouched. This page covers the basics, unique rows across several columns, the...">
+<link rel="canonical" href="https://www.snakbacks.com/unique-function-google-sheets">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1a5fa0">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Snakbacks">
+<meta property="og:title" content="UNIQUE Function in Google Sheets: Multiple Columns, Sorted | Snakbacks">
+<meta property="og:description" content="UNIQUE returns the distinct rows from a range and leaves the original data untouched. This page covers the basics, unique rows across several columns, the...">
+<meta property="og:url" content="https://www.snakbacks.com/unique-function-google-sheets">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"UNIQUE Function in Google Sheets: Multiple Columns, Sorted","author":{"@type":"Organization","name":"Snakbacks"},"publisher":{"@type":"Organization","name":"Snakbacks"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<nav aria-label="Main"><ul class="nav">
+<li><a href="/#products">Products</a></li>
+<li><a href="/guides" aria-current="page">Guides</a></li>
+<li><a href="/pro">Pro</a></li>
+<li><a href="/takeover">Takeover</a></li>
+<li><a href="/about">About</a></li>
+</ul></nav>
+</div></header>
+<main id="main">
+<div class="wrap"><article class="page-head prose">
+<p class="crumbs"><a href="/">Home</a> / <a href="/guides">Guides</a> / <a href="/guides#duplicates">Duplicates</a></p>
+<h1 style="font-size:clamp(1.8rem,5vw,2.6rem)">UNIQUE Function in Google Sheets: Multiple Columns, Sorted</h1>
+<p class="ailine">Written with AI assistance; tested in a real Google Sheet.</p>
+<aside class="callout dedupe" aria-label="Free add-on"><img src="/assets/dedupe-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Duplicate Remover</span> <span class="tag">Free add-on</span></p>
+<p>Highlight duplicate rows, add a "Duplicate?" column, or copy the repeats to a new sheet, from the Extensions menu. No sidebar and no formulas to write.</p>
+<p><a href="/duplicate-remover">About Duplicate Remover</a> &middot; <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Get it on the Marketplace</a></p></div></aside>
+<p>UNIQUE returns the distinct rows from a range and leaves the original data untouched. This page covers the basics, unique rows across several columns, the optional arguments, sorting, ignoring blanks, counting unique values, and the case-sensitivity detail that surprises people.</p>
+<h2>The sample data</h2>
+<p>Row 1 holds headers. A2:B7 (customer, region):</p>
+<ul><li>Acme, East</li><li>Globex, West</li><li>Acme, East</li><li>Initech, East</li><li>Globex, North</li><li>acme, East</li></ul>
+<h2>UNIQUE on one column</h2>
+<pre><code>=UNIQUE(A2:A7)</code></pre>
+<p>This returns Acme, Globex, Initech, acme, in order of first appearance. It spills down from the cell you typed it in, so the cells below must be empty. The result updates when the source changes.</p>
+<h2>UNIQUE on multiple columns</h2>
+<p>Give UNIQUE a range with several columns and it treats each whole row as the unit:</p>
+<pre><code>=UNIQUE(A2:B7)</code></pre>
+<p>This returns Acme East, Globex West, Initech East, Globex North, acme East. Acme East appears once because both columns match in rows 2 and 4. Globex appears twice because the regions differ. To get distinct values from each column separately, use one UNIQUE per column.</p>
+<h2>The optional arguments</h2>
+<p>The full form is UNIQUE(range, [by_column], [exactly_once]). by_column set to TRUE compares columns instead of rows, which is rarely needed. exactly_once set to TRUE returns only values that appear a single time in the data, dropping anything repeated:</p>
+<pre><code>=UNIQUE(A2:A7,FALSE,TRUE)</code></pre>
+<p>On the sample, this returns Initech and acme. Initech appears once, and lower-case &quot;acme&quot; also counts as appearing once, because UNIQUE treats it as different from &quot;Acme&quot;. Use it to find one-off entries, and lower-case the range first if capitals should not matter. On two columns, =UNIQUE(A2:B7,FALSE,TRUE) returns the rows that occur exactly once: Globex West, Initech East, Globex North and acme East.</p>
+<h2>Sorted unique list</h2>
+<p>UNIQUE keeps order of first appearance. Wrap it in SORT for alphabetical:</p>
+<pre><code>=SORT(UNIQUE(A2:A7))</code></pre>
+<p>This returns Acme, acme, Globex, Initech. SORT ignores case, so the two spellings sit together. Add FALSE as the second SORT argument for descending order: =SORT(UNIQUE(A2:A7),1,FALSE).</p>
+<h2>Ignoring blanks</h2>
+<p>If your range runs past the data, such as A2:A100, UNIQUE includes one extra blank row for the empty cells. Filter the blanks out first:</p>
+<pre><code>=UNIQUE(FILTER(A2:A100,A2:A100&lt;&gt;&quot;&quot;))</code></pre>
+<p>This returns the four values only. Sorted too:</p>
+<pre><code>=SORT(UNIQUE(FILTER(A2:A100,A2:A100&lt;&gt;&quot;&quot;)))</code></pre>
+<h2>Counting unique values</h2>
+<pre><code>=COUNTUNIQUE(A2:A7)</code></pre>
+<p>This returns 4. With blanks in the range, COUNTUNIQUE ignores empty cells, so it does not need FILTER. Careful with two columns: =COUNTUNIQUE(A2:B7) returns 7, because it counts distinct cell values (Acme, East, Globex, West, Initech, North, acme), not rows. To count unique rows, use =ROWS(UNIQUE(A2:B7)), which returns 5.</p>
+<h2>Case sensitivity</h2>
+<p>UNIQUE and COUNTUNIQUE are case-sensitive, so &quot;acme&quot; and &quot;Acme&quot; count as different values, which is why the sample returns four names rather than three. To treat them as one, lower-case the range first:</p>
+<pre><code>=UNIQUE(ARRAYFORMULA(LOWER(A2:A7)))</code></pre>
+<p>This returns acme, globex, initech. More on case in lookups and matching is at <a href="/case-insensitive-match-google-sheets">Case-Sensitive and Case-Insensitive Match in Google Sheets</a></p>
+<p>Hidden differences matter too. &quot;Acme&quot; and &quot;Acme &quot; with a trailing space are distinct values, so clean first with ARRAYFORMULA(TRIM(...)). Our guide to hidden spaces is at <a href="/trim-not-working-google-sheets">TRIM Not Working in Google Sheets? Remove Hidden Spaces</a></p>
+<h2>A frequency list: UNIQUE plus COUNTIF</h2>
+<p>To list each name with how many times it appears, put the unique list in D2 and a count beside it in E2:</p>
+<pre><code>=UNIQUE(A2:A7)
+=ARRAYFORMULA(COUNTIF(A2:A7,D2:D5))</code></pre>
+<p>This gives Acme 3, Globex 2, Initech 1, acme 3. COUNTIF ignores case, so &quot;acme&quot; is counted along with &quot;Acme&quot;, which makes the counts higher than the list suggests. To avoid the mismatch, use the lower-cased unique list from the previous section so each name appears once with the right total. More ways to count repeats are at <a href="/count-duplicates-google-sheets">How to Count Duplicates in Google Sheets (COUNTIF, QUERY)</a></p>
+<h2>Where UNIQUE stops</h2>
+<p>UNIQUE only matches identical values. &quot;Acme Pty Ltd&quot; and &quot;ACME Pty. Ltd&quot; are different to it, as are typos and reworded names. Cleaning with TRIM and LOWER helps with spacing and case. Punctuation and spelling variants need similarity matching, not formulas.</p>
+<h2>When an add-on or script pack helps</h2>
+<p>Disclosure: Snakbacks, the publisher of this site, sells a paid script pack and makes two free add-ons for Google Sheets.</p>
+<p>Everything above needs nothing but Google Sheets. For near-duplicates that UNIQUE keeps separate, the Data Cleanup Kit for Google Sheets (US$15, no add-on install): <a href="https://snakback.gumroad.com/l/data-cleanup-kit">snakback.gumroad.com/l/data-cleanup-kit</a> groups them with FUZZYDUPES, and adds ready-made tabs for merging and summing, keeping the latest row, comparing lists, splitting names and cleaning text.</p>
+<p>Our free add-on Fuzzy Match is now on the Google Workspace Marketplace: <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Fuzzy Match on the Marketplace</a>. Duplicate Remover is now on the Marketplace too: <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Duplicate Remover on the Marketplace</a>.</p>
+<p>Snakbacks publishes the Duplicate Remover and Fuzzy Match add-ons.</p>
+<aside class="callout dedupe" aria-label="Free add-on"><img src="/assets/dedupe-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Duplicate Remover</span> <span class="tag">Free add-on</span></p>
+<p>Highlight duplicate rows, add a "Duplicate?" column, or copy the repeats to a new sheet, from the Extensions menu. No sidebar and no formulas to write.</p>
+<p><a href="/duplicate-remover">About Duplicate Remover</a> &middot; <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Get it on the Marketplace</a></p></div></aside>
+<div class="related"><h2 style="font-size:1.2rem;margin-top:0">More duplicates guides</h2><ul class="guide-list"><li><a href="/remove-duplicates-google-sheets">How to Remove Duplicates in Google Sheets: 5 Ways</a></li><li><a href="/remove-duplicates-google-sheets-multiple-columns">Remove Duplicates in Google Sheets by Multiple Columns</a></li><li><a href="/remove-duplicates-keep-latest-google-sheets">Remove Duplicates and Keep the Latest in Google Sheets</a></li><li><a href="/highlight-duplicates-google-sheets">How to Highlight Duplicates in Google Sheets (Formulas)</a></li></ul><p><a href="/guides">All guides</a></p></div>
+</article></div>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div class="foot-grid">
+<div><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<p class="muted">A small Australian studio making Google Sheets add-ons.</p>
+<p>info@snakbacks.com<br>PO Box 1400, Burpengary D.C. QLD 4505, Australia</p></div>
+<div><h2>Products</h2><ul>
+<li><a href="/fuzzy-match">Fuzzy Match</a></li><li><a href="/duplicate-remover">Duplicate Remover</a></li><li><a href="/pro">Snakbacks Pro</a></li></ul></div>
+<div><h2>Resources</h2><ul>
+<li><a href="/guides">Guides</a></li><li><a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a></li><li><a href="https://snakback.gumroad.com/l/data-cleanup-kit">Data Cleanup Kit</a></li><li><a href="https://snakback.gumroad.com/l/levenshtein-starter">Levenshtein starter (free)</a></li></ul></div>
+<div><h2>Studio</h2><ul>
+<li><a href="/about">About</a></li><li><a href="/takeover">Add-on takeover</a></li><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="mailto:info@snakbacks.com">Contact</a></li></ul></div>
+</div>
+<p class="fine">Google Sheets, Google Workspace and Google Workspace Marketplace are trademarks of Google LLC. Snakbacks is not affiliated with or endorsed by Google. No tracking or analytics on this site.</p>
+</div></footer>
+</body>
+</html>

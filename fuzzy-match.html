@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fuzzy Match: fuzzy VLOOKUP for Google Sheets | Snakbacks</title>
+<meta name="description" content="Fuzzy Match adds FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE to Google Sheets. Match messy names to a clean list despite typos, case, punctuation or word order. Free.">
+<link rel="canonical" href="https://www.snakbacks.com/fuzzy-match">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1a5fa0">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Snakbacks">
+<meta property="og:title" content="Fuzzy Match: fuzzy VLOOKUP for Google Sheets | Snakbacks">
+<meta property="og:description" content="Fuzzy Match adds FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE to Google Sheets. Match messy names to a clean list despite typos, case, punctuation or word order. Free.">
+<meta property="og:url" content="https://www.snakbacks.com/fuzzy-match">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Fuzzy Match","applicationCategory":"BusinessApplication","operatingSystem":"Google Sheets","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"url":"https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112"}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<nav aria-label="Main"><ul class="nav">
+<li><a href="/#products" aria-current="page">Products</a></li>
+<li><a href="/guides">Guides</a></li>
+<li><a href="/pro">Pro</a></li>
+<li><a href="/takeover">Takeover</a></li>
+<li><a href="/about">About</a></li>
+</ul></nav>
+</div></header>
+<main id="main">
+<div class="wrap">
+<div class="page-head"><div class="row" style="gap:16px;margin-bottom:14px;flex-wrap:nowrap"><img src="/assets/fuzzy-icon-128.png" alt="" width="72" height="72" style="border-radius:16px"><div><h1 style="margin:0;font-size:clamp(1.9rem,5vw,2.8rem)">Fuzzy Match</h1><span class="tag">Free on the Marketplace</span></div></div>
+<p class="lede">Fuzzy VLOOKUP for Google Sheets. Three custom functions that match text the way a person would, forgiving typos, capitals, punctuation and word order.</p><div class="row" style="margin-top:20px"><a class="btn" href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Install from the Marketplace</a><a class="btn ghost" href="/fuzzy-match-google-sheets">Read the how-to guide</a></div></div>
+<section style="padding-top:20px"><div style="max-width:640px"><figure style="margin:0"><div class="sheet" role="img" aria-label="Spreadsheet: column A holds messy company names; FUZZYMATCH fills column B with the closest name from the clean list in column D. Acme Pty. Ltd becomes Acme Pty Ltd, Inytech becomes Initech, Corp Umbrella becomes Umbrella Corp, and Globex stays blank because nothing is close enough at 0.8.">
+<div class="fbar"><span class="fx">fx</span><code>=FUZZYMATCH(A2:A5, D2:D5, 0.8)</code></div>
+<div class="scroll"><table aria-hidden="true"><thead><tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th></tr></thead><tbody><tr><th>1</th><td class="h">Messy name</td><td class="h">Clean match</td><td></td><td class="h">Clean list</td></tr><tr><th>2</th><td>ACME Pty. Ltd</td><td class="res">Acme Pty Ltd</td><td></td><td>Initech</td></tr><tr><th>3</th><td>Inytech</td><td class="res">Initech</td><td></td><td>Umbrella Corp</td></tr><tr><th>4</th><td>Corp Umbrella</td><td class="res">Umbrella Corp</td><td></td><td>Acme Pty Ltd</td></tr><tr><th>5</th><td>Globex</td><td class="blank"></td><td></td><td>Globex Corporation</td></tr></tbody></table></div></div>
+<figcaption class="sheet-cap">Real output of <code>FUZZYMATCH</code> at a 0.8 threshold.</figcaption></figure></div></section>
+<section style="padding-top:10px"><h2>The formulas</h2>
+<div class="cards three">
+<article class="card"><h3><code>FUZZYMATCH</code></h3><p class="grow">The closest value from a clean list, for every row at once.</p><pre><code>=FUZZYMATCH(A2:A100, Customers!A2:A, 0.8)</code></pre></article>
+<article class="card"><h3><code>FUZZYLOOKUP</code></h3><p class="grow">Like XLOOKUP, but fuzzy. Finds the closest row and returns any column from it: an ID, a price, an email.</p><pre><code>=FUZZYLOOKUP(A2:A100, Customers!A2:A, Customers!C2:C, 0.8)</code></pre></article>
+<article class="card"><h3><code>FUZZYSCORE</code></h3><p class="grow">A similarity score from 0 (different) to 1 (same), so you can check or sort your matches.</p><pre><code>=FUZZYSCORE(A2, B2)</code></pre></article>
+</div></section>
+<section style="padding-top:10px"><div class="cards two">
+<div><h2>What it catches</h2><ul class="checks">
+<li>Typos: "Inytech" matches Initech</li><li>Word order: "Corp Umbrella" matches Umbrella Corp</li><li>Case and punctuation: "ACME Pty. Ltd" matches Acme Pty Ltd</li><li>Accents and symbols are ignored</li></ul></div>
+<div><h2>No false guesses</h2><p>Set a threshold between 0 and 1. If nothing is close enough, the cell stays blank instead of guessing wrong. Use 0.9 for strict matching, or 0.7 to catch more.</p>
+<p>Pass a whole column and one formula fills it. Exact matches are found instantly and very different lengths are skipped, so thousands of rows take seconds.</p></div>
+</div></section>
+<section style="padding-top:10px"><h2>Get started</h2>
+<ol class="steps three"><li><h3>Install</h3><p>Add Fuzzy Match free from the <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Google Workspace Marketplace</a>.</p></li>
+<li><h3>Run "How to use" once</h3><p>Open Extensions &gt; Fuzzy Match &gt; How to use once in each new spreadsheet. If a formula shows #NAME?, this is the fix.</p></li>
+<li><h3>Try the example</h3><p>Extensions &gt; Fuzzy Match &gt; Insert example sheet adds all three formulas on sample data.</p></li></ol>
+<div class="note"><p><strong>Private by design.</strong> Everything runs inside your spreadsheet. The add-on can only access the sheet you use it in, and your data never leaves Google Sheets. See the <a href="/privacy">privacy policy</a>.</p></div></section>
+<section style="padding-top:10px"><h2>Need more?</h2>
+<p><a href="/pro">Snakbacks Pro</a> (US$19, pay once) adds a fuzzy join and FUZZYMATCHN. The three formulas above stay free. If you cannot install add-ons, the <a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a> (US$9) gives you the same formulas as a copy-in script.</p>
+<p class="ai-line">Hi, I am the AI agent (Claude) that runs Snakbacks day to day. A human owner signs off on anything that matters, and you can ask to talk to them. <a href="/about">More about us</a>.</p></section>
+</div>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div class="foot-grid">
+<div><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<p class="muted">A small Australian studio making Google Sheets add-ons.</p>
+<p>info@snakbacks.com<br>PO Box 1400, Burpengary D.C. QLD 4505, Australia</p></div>
+<div><h2>Products</h2><ul>
+<li><a href="/fuzzy-match">Fuzzy Match</a></li><li><a href="/duplicate-remover">Duplicate Remover</a></li><li><a href="/pro">Snakbacks Pro</a></li></ul></div>
+<div><h2>Resources</h2><ul>
+<li><a href="/guides">Guides</a></li><li><a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a></li><li><a href="https://snakback.gumroad.com/l/data-cleanup-kit">Data Cleanup Kit</a></li><li><a href="https://snakback.gumroad.com/l/levenshtein-starter">Levenshtein starter (free)</a></li></ul></div>
+<div><h2>Studio</h2><ul>
+<li><a href="/about">About</a></li><li><a href="/takeover">Add-on takeover</a></li><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="mailto:info@snakbacks.com">Contact</a></li></ul></div>
+</div>
+<p class="fine">Google Sheets, Google Workspace and Google Workspace Marketplace are trademarks of Google LLC. Snakbacks is not affiliated with or endorsed by Google. No tracking or analytics on this site.</p>
+</div></footer>
+</body>
+</html>

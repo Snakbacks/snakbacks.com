@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VLOOKUP Returns #N/A in Google Sheets: Causes and Fixes | Snakbacks</title>
+<meta name="description" content="VLOOKUP returns #N/A when it cannot find your search value in the first column of the range. Often the value looks like it is there. This page covers the...">
+<link rel="canonical" href="https://www.snakbacks.com/vlookup-na-error-google-sheets">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1a5fa0">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Snakbacks">
+<meta property="og:title" content="VLOOKUP Returns #N/A in Google Sheets: Causes and Fixes | Snakbacks">
+<meta property="og:description" content="VLOOKUP returns #N/A when it cannot find your search value in the first column of the range. Often the value looks like it is there. This page covers the...">
+<meta property="og:url" content="https://www.snakbacks.com/vlookup-na-error-google-sheets">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"VLOOKUP Returns #N/A in Google Sheets: Causes and Fixes","author":{"@type":"Organization","name":"Snakbacks"},"publisher":{"@type":"Organization","name":"Snakbacks"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<nav aria-label="Main"><ul class="nav">
+<li><a href="/#products">Products</a></li>
+<li><a href="/guides" aria-current="page">Guides</a></li>
+<li><a href="/pro">Pro</a></li>
+<li><a href="/takeover">Takeover</a></li>
+<li><a href="/about">About</a></li>
+</ul></nav>
+</div></header>
+<main id="main">
+<div class="wrap"><article class="page-head prose">
+<p class="crumbs"><a href="/">Home</a> / <a href="/guides">Guides</a> / <a href="/guides#lookups">Lookups and matching</a></p>
+<h1 style="font-size:clamp(1.8rem,5vw,2.6rem)">VLOOKUP Returns #N/A in Google Sheets: Causes and Fixes</h1>
+<p class="ailine">Written with AI assistance; tested in a real Google Sheet.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<p>VLOOKUP returns #N/A when it cannot find your search value in the first column of the range. Often the value looks like it is there. This page covers the usual causes in the order worth checking, with a formula fix for each, and ends with the case where the value is genuinely missing or just spelled differently.</p>
+<h2>The sample data</h2>
+<p>Master list, D2:E5 (name, ID):</p>
+<ul><li>Initech, 101</li><li>Umbrella Corp, 102</li><li>Acme Pty Ltd, 103</li><li>Globex Corporation, 104</li></ul>
+<p>Search values go in column A from A2, results in column B. Row 1 holds headers.</p>
+<h2>Cause 1: extra spaces</h2>
+<p>&quot;Initech &quot; with a trailing space is a different value from &quot;Initech&quot;. Wrap the search value in TRIM:</p>
+<pre><code>=VLOOKUP(TRIM(A2),$D$2:$E$5,2,FALSE)</code></pre>
+<p>With A2 = &quot;Initech &quot; (trailing space), the plain VLOOKUP gives #N/A and the TRIM version gives 101. To check a cell, use =LEN(A2)&lt;&gt;LEN(TRIM(A2)). TRUE means it has extra spaces.</p>
+<p>Text pasted from web pages often contains non-breaking spaces (character 160), which TRIM does not remove. Swap them for normal spaces first:</p>
+<pre><code>=VLOOKUP(TRIM(SUBSTITUTE(A2,CHAR(160),&quot; &quot;)),$D$2:$E$5,2,FALSE)</code></pre>
+<p>If the spaces are in the master list rather than the search value, TRIM on the search value cannot help. Clean the list in a helper column, F2 filled down, then look up against it:</p>
+<pre><code>=TRIM(SUBSTITUTE(D2,CHAR(160),&quot; &quot;))
+=INDEX($E$2:$E$5,MATCH(TRIM(A2),$F$2:$F$5,0))</code></pre>
+<h2>Cause 2: numbers stored as text</h2>
+<p>A text &quot;102&quot; and a number 102 look the same but do not match. Take a price list J2:K4 (ID, product) with real numbers: 101 Widget, 102 Gadget, 103 Gizmo. If A2 holds 102 as text (it left-aligns, and =ISTEXT(A2) is TRUE), convert the search value:</p>
+<pre><code>=VLOOKUP(VALUE(A2),$J$2:$K$4,2,FALSE)</code></pre>
+<p>This returns Gadget. If it is the other way round, with text IDs in the list and a real number in A2, convert the search value to text. Either of these works:</p>
+<pre><code>=VLOOKUP(TO_TEXT(A2),$J$2:$K$4,2,FALSE)
+=VLOOKUP(A2&amp;&quot;&quot;,$J$2:$K$4,2,FALSE)</code></pre>
+<p>Imported CSVs, IDs with leading zeros and cells that start with an apostrophe are the usual sources.</p>
+<h2>Cause 3: the FALSE was left out</h2>
+<p>The fourth argument controls exact versus approximate matching. If you leave it out, Sheets assumes TRUE (approximate), which expects the first column sorted ascending. On unsorted data it can return #N/A or a wrong row, with no warning. On the four-row sample list above (unsorted), =VLOOKUP(&quot;Initech&quot;,$D$2:$E$5,2) returned 104, which is Globex's ID, not Initech's 101. For almost every lookup, write FALSE:</p>
+<pre><code>=VLOOKUP(&quot;Acme Pty Ltd&quot;,$D$2:$E$5,2,FALSE)</code></pre>
+<p>This returns 103.</p>
+<h2>Cause 4: the lookup column is not first</h2>
+<p>VLOOKUP only searches the leftmost column of the range, and can only return from columns to its right. If you search for an ID (column E) and want the name (column D), VLOOKUP over D2:E5 fails. Use INDEX and MATCH, which do not care about order:</p>
+<pre><code>=INDEX($D$2:$D$5,MATCH(A2,$E$2:$E$5,0))</code></pre>
+<p>With A2 = 103 this returns Acme Pty Ltd. XLOOKUP does the same: =XLOOKUP(A2,$E$2:$E$5,$D$2:$D$5,&quot;Not found&quot;).</p>
+<h2>Cause 5: the range is not locked</h2>
+<p>If you write =VLOOKUP(A2,D2:E5,2,FALSE) and fill down, the range slides down with each row: D3:E6, then D4:E7. Rows drop off the top of your list, and the lookup fails further down. Lock the range with dollar signs (press F4 while editing):</p>
+<pre><code>=VLOOKUP(A2,$D$2:$E$5,2,FALSE)</code></pre>
+<p>With A2:A5 = Globex Corporation, Acme Pty Ltd, Initech, Umbrella Corp and the unlocked version filled down, you get 104, 103, #N/A, #N/A. The locked version gives 104, 103, 101, 102.</p>
+<h2>Cause 6: the value really is missing</h2>
+<p>Once the causes above are ruled out, #N/A is the correct answer. To show something cleaner, use IFNA, which catches only #N/A:</p>
+<pre><code>=IFNA(VLOOKUP(A2,$D$2:$E$5,2,FALSE),&quot;Not found&quot;)</code></pre>
+<p>With A2 = Wayne, this shows Not found. Prefer IFNA to IFERROR. IFERROR hides every error, including a mistyped column number, so a real bug looks like a missing value. Use IFERROR(...,&quot;&quot;) only once the sheet is finished and checked.</p>
+<h2>Cause 7: spelled almost the same</h2>
+<p>&quot;Inytech&quot; is not &quot;Initech&quot;, and &quot;Acme Pty&quot; is not &quot;Acme Pty Ltd&quot;. TRIM and exact matching cannot bridge that. If the difference is one string sitting inside another, see our partial-match guide, which uses wildcards: <a href="/vlookup-partial-match-google-sheets">VLOOKUP Partial Match in Google Sheets (Wildcards, Contains)</a> If it is typos, extra words or different word order, formulas will not find it, and you have to match by similarity.</p>
+<h2>Quick diagnosis</h2>
+<ol><li>Test the match directly: =A2=D2 returns FALSE if they differ.</li><li>Compare lengths with =LEN(A2) and =LEN(D2). A mismatch means hidden spaces.</li><li>Compare =ISNUMBER(A2) and =ISNUMBER(D2). A mismatch means text versus number.</li><li>Check the FALSE, the $ signs, and which column holds the key.</li></ol>
+<h2>When an add-on or script pack helps</h2>
+<p>Disclosure: Snakbacks, the publisher of this site, sells a paid script pack and makes two free add-ons for Google Sheets.</p>
+<p>If your cleaned data still gives #N/A because of typos or spelling variants, the Fuzzy Match Template for Google Sheets (US$9, no add-on install): <a href="https://snakback.gumroad.com/l/fuzzy-formulas">snakback.gumroad.com/l/fuzzy-formulas</a> adds FUZZYLOOKUP(values, lookup, return_range, [threshold]) and FUZZYSCORE(a, b), pasted into your sheet once so it works where a Workspace admin blocks add-ons, with a 30-day refund if it does not help. Causes 1 to 6 need nothing but the free formulas above.</p>
+<p>Our free add-on Fuzzy Match is now on the Google Workspace Marketplace: <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Fuzzy Match on the Marketplace</a>. Duplicate Remover is now on the Marketplace too: <a href="https://workspace.google.com/marketplace/app/duplicate_remover_for_google_sheets/396899597509">Duplicate Remover on the Marketplace</a>.</p>
+<p>Tip: after installing, open Extensions &gt; Fuzzy Match &gt; How to use once in each new spreadsheet. Until you do, its formulas can show #NAME?.</p>
+<p>Snakbacks publishes the Duplicate Remover and Fuzzy Match add-ons.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<div class="related"><h2 style="font-size:1.2rem;margin-top:0">More lookups and matching guides</h2><ul class="guide-list"><li><a href="/vlookup-partial-match-google-sheets">VLOOKUP Partial Match in Google Sheets (Wildcards, Contains)</a></li><li><a href="/xlookup-google-sheets">XLOOKUP in Google Sheets: Syntax, Wildcards and Examples</a></li><li><a href="/index-match-google-sheets">INDEX MATCH in Google Sheets: Syntax, Examples, vs VLOOKUP</a></li><li><a href="/case-insensitive-match-google-sheets">Case-Sensitive and Case-Insensitive Match in Google Sheets</a></li></ul><p><a href="/guides">All guides</a></p></div>
+</article></div>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div class="foot-grid">
+<div><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<p class="muted">A small Australian studio making Google Sheets add-ons.</p>
+<p>info@snakbacks.com<br>PO Box 1400, Burpengary D.C. QLD 4505, Australia</p></div>
+<div><h2>Products</h2><ul>
+<li><a href="/fuzzy-match">Fuzzy Match</a></li><li><a href="/duplicate-remover">Duplicate Remover</a></li><li><a href="/pro">Snakbacks Pro</a></li></ul></div>
+<div><h2>Resources</h2><ul>
+<li><a href="/guides">Guides</a></li><li><a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a></li><li><a href="https://snakback.gumroad.com/l/data-cleanup-kit">Data Cleanup Kit</a></li><li><a href="https://snakback.gumroad.com/l/levenshtein-starter">Levenshtein starter (free)</a></li></ul></div>
+<div><h2>Studio</h2><ul>
+<li><a href="/about">About</a></li><li><a href="/takeover">Add-on takeover</a></li><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="mailto:info@snakbacks.com">Contact</a></li></ul></div>
+</div>
+<p class="fine">Google Sheets, Google Workspace and Google Workspace Marketplace are trademarks of Google LLC. Snakbacks is not affiliated with or endorsed by Google. No tracking or analytics on this site.</p>
+</div></footer>
+</body>
+</html>

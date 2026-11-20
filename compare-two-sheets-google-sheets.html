@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Compare Two Sheets in Google Sheets (Find Differences) | Snakbacks</title>
+<meta name="description" content="To compare two sheets in Google Sheets you have two different jobs. One is a cell-by-cell comparison of two tabs with the same layout. The other is...">
+<link rel="canonical" href="https://www.snakbacks.com/compare-two-sheets-google-sheets">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1a5fa0">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Snakbacks">
+<meta property="og:title" content="Compare Two Sheets in Google Sheets (Find Differences) | Snakbacks">
+<meta property="og:description" content="To compare two sheets in Google Sheets you have two different jobs. One is a cell-by-cell comparison of two tabs with the same layout. The other is...">
+<meta property="og:url" content="https://www.snakbacks.com/compare-two-sheets-google-sheets">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Compare Two Sheets in Google Sheets (Find Differences)","author":{"@type":"Organization","name":"Snakbacks"},"publisher":{"@type":"Organization","name":"Snakbacks"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<nav aria-label="Main"><ul class="nav">
+<li><a href="/#products">Products</a></li>
+<li><a href="/guides" aria-current="page">Guides</a></li>
+<li><a href="/pro">Pro</a></li>
+<li><a href="/takeover">Takeover</a></li>
+<li><a href="/about">About</a></li>
+</ul></nav>
+</div></header>
+<main id="main">
+<div class="wrap"><article class="page-head prose">
+<p class="crumbs"><a href="/">Home</a> / <a href="/guides">Guides</a> / <a href="/guides#lookups">Lookups and matching</a></p>
+<h1 style="font-size:clamp(1.8rem,5vw,2.6rem)">Compare Two Sheets in Google Sheets (Find Differences)</h1>
+<p class="ailine">Written with AI assistance; tested in a real Google Sheet.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<p>To compare two sheets in Google Sheets you have two different jobs. One is a cell-by-cell comparison of two tabs with the same layout. The other is matching rows by a key, to find rows in Sheet1 that are not in Sheet2. This page covers both with formulas, plus a highlighting rule that works across tabs.</p>
+<h2>The sample data</h2>
+<p>Sheet1 A1:B5 (Item, Qty): Apple 5; Banana 3; Cherry 7; Date 2.</p>
+<p>Sheet2 A1:B5 (Item, Qty): Apple 5; Banana 4; Cherry 7; Dates 2.</p>
+<p>Two things differ: Banana has quantity 3 on one sheet and 4 on the other, and &quot;Date&quot; is spelled &quot;Dates&quot; on Sheet2. Add a third tab called Diff for the results.</p>
+<h2>Method 1: cell-by-cell differences on a third sheet</h2>
+<p>In Diff!A1, one formula fills the whole grid:</p>
+<pre><code>=ARRAYFORMULA(IF(Sheet1!A1:B5=Sheet2!A1:B5,&quot;&quot;,Sheet1!A1:B5&amp;&quot; -&gt; &quot;&amp;Sheet2!A1:B5))</code></pre>
+<p>Result: every cell is blank except Diff!B3 (&quot;3 -&gt; 4&quot;) and Diff!A5 (&quot;Date -&gt; Dates&quot;). A blank cell means the two sheets agree. Both ranges must be the same size, so use the same corner and the same number of rows and columns.</p>
+<p>The = comparison ignores case, so &quot;apple&quot; equals &quot;Apple&quot;. For a case-sensitive version use EXACT:</p>
+<pre><code>=ARRAYFORMULA(IF(EXACT(Sheet1!A1:B5,Sheet2!A1:B5),&quot;&quot;,Sheet1!A1:B5&amp;&quot; -&gt; &quot;&amp;Sheet2!A1:B5))</code></pre>
+<p>To count the differences:</p>
+<pre><code>=SUMPRODUCT(--(Sheet1!A1:B5&lt;&gt;Sheet2!A1:B5))</code></pre>
+<p>Result: 2.</p>
+<p>This only works when row 3 on one sheet is meant to be row 3 on the other. If the rows are in a different order, or one sheet has an extra row, every row after it will differ. In that case, match by key instead.</p>
+<h2>Method 2: match rows by key with COUNTIF or MATCH</h2>
+<p>In Sheet1!C2, fill down:</p>
+<pre><code>=IF(A2=&quot;&quot;,&quot;&quot;,IF(COUNTIF(Sheet2!$A$2:$A$100,A2)=0,&quot;Missing in Sheet2&quot;,&quot;Found&quot;))</code></pre>
+<p>Result for C2:C5: Found, Found, Found, Missing in Sheet2. &quot;Date&quot; is flagged because Sheet2 only has &quot;Dates&quot;. COUNTIF matches the whole cell, not part of it.</p>
+<p>The same with MATCH:</p>
+<pre><code>=IF(A2=&quot;&quot;,&quot;&quot;,IF(ISNA(MATCH(A2,Sheet2!$A$2:$A$100,0)),&quot;Missing in Sheet2&quot;,&quot;Found&quot;))</code></pre>
+<p>The result is identical. MATCH is handy when you also want the position.</p>
+<p>To go one step further and compare the quantity of the matched row, in D2:</p>
+<pre><code>=IF(A2=&quot;&quot;,&quot;&quot;,IFERROR(IF(INDEX(Sheet2!$B$2:$B$100,MATCH(A2,Sheet2!$A$2:$A$100,0))=B2,&quot;Same&quot;,&quot;Different&quot;),&quot;Missing in Sheet2&quot;))</code></pre>
+<p>Result for D2:D5: Same, Different, Same, Missing in Sheet2.</p>
+<p>To find rows in Sheet2 that are missing from Sheet1, put the mirror formula on Sheet2 with the sheet names swapped.</p>
+<h2>Method 3: FILTER the rows missing from the other sheet</h2>
+<p>This lists the rows themselves, with no helper column. In Diff!A1:</p>
+<pre><code>=FILTER(Sheet1!A2:B100,Sheet1!A2:A100&lt;&gt;&quot;&quot;,COUNTIF(Sheet2!A2:A100,Sheet1!A2:A100)=0)</code></pre>
+<p>Result: one row, Date 2. For the other direction, swap the sheets:</p>
+<pre><code>=FILTER(Sheet2!A2:B100,Sheet2!A2:A100&lt;&gt;&quot;&quot;,COUNTIF(Sheet1!A2:A100,Sheet2!A2:A100)=0)</code></pre>
+<p>Result: Dates 2. If nothing is missing, FILTER shows an error saying no matches, so wrap it in IFERROR(...,&quot;Nothing missing&quot;) if you want a clean message.</p>
+<p>To list rows where the whole row (Item and Qty) has no exact twin, use COUNTIFS on both columns:</p>
+<pre><code>=FILTER(Sheet1!A2:B100,Sheet1!A2:A100&lt;&gt;&quot;&quot;,COUNTIFS(Sheet2!A2:A100,Sheet1!A2:A100,Sheet2!B2:B100,Sheet1!B2:B100)=0)</code></pre>
+<p>Result: Banana 3 and Date 2. Banana's row has no twin because its quantity differs.</p>
+<h2>Method 4: highlight differences with conditional formatting and INDIRECT</h2>
+<p>A conditional formatting rule cannot point straight at another sheet. INDIRECT turns text into a reference and gets around that. Select Sheet1!A2:A100, open Format &gt; Conditional formatting, choose &quot;Custom formula is&quot;, and use:</p>
+<pre><code>=AND($A2&lt;&gt;&quot;&quot;,COUNTIF(INDIRECT(&quot;Sheet2!$A$2:$A$100&quot;),$A2)=0)</code></pre>
+<p>Result: A5 (Date) is highlighted. If the tab name has spaces, use INDIRECT(&quot;'Old List'!$A$2:$A$100&quot;).</p>
+<p>For a cell-by-cell highlight, select Sheet1!A2:B100 and use:</p>
+<pre><code>=A2&lt;&gt;INDIRECT(&quot;Sheet2!&quot;&amp;ADDRESS(ROW(),COLUMN(),4))</code></pre>
+<p>Result: B3 (3 against 4) and A5 (Date against Dates) are highlighted. ADDRESS with the 4 builds a plain reference such as &quot;B3&quot;, so each cell is compared with the same cell on Sheet2.</p>
+<h2>Why a comparison looks wrong</h2>
+<ul><li>Extra spaces. &quot;Banana&quot; and &quot;Banana &quot; differ. Use Data &gt; Data cleanup &gt; Trim whitespace on both sheets first.</li><li>Numbers stored as text. &quot;5&quot; typed as text does not equal the number 5.</li><li>Different sized ranges in Method 1 cause an error.</li><li>Sorted differently. Use Methods 2 and 3, which look rows up by key, rather than Method 1.</li><li>Spelling differences. &quot;Date&quot; and &quot;Dates&quot; are simply different strings, and none of the formulas above treat them as the same item.</li></ul>
+<h2>When an add-on or script pack helps</h2>
+<p>Disclosure: Snakbacks, the publisher of this site, sells a paid script pack and makes two free add-ons for Google Sheets.</p>
+<p>Methods 2 and 3 only match keys that are exactly the same. If the two sheets come from different systems, with &quot;Date&quot; on one and &quot;Dates&quot;, &quot;Dte&quot; or &quot;date &quot; on the other, you will see a lot of false &quot;missing&quot; rows. Fuzzy Match Template for Google Sheets (US$9, no add-on install): <a href="https://snakback.gumroad.com/l/fuzzy-formulas">snakback.gumroad.com/l/fuzzy-formulas</a>. It adds FUZZYLOOKUP(values, lookup, return_range, [threshold]), a fuzzy XLOOKUP, and FUZZYMATCH and FUZZYSCORE, so near-matches can be paired instead of flagged as missing. You paste the functions into your sheet once, so it works where a Workspace admin blocks add-ons. There is a 30-day refund if it does not work for you. If both sheets use the same clean IDs, the free formulas above are enough.</p>
+<p>Fuzzy Match, our free add-on, is on the Google Workspace Marketplace: <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Fuzzy Match on the Marketplace</a>.</p>
+<p>Tip: after installing, open Extensions &gt; Fuzzy Match &gt; How to use once in each new spreadsheet. Until you do, its formulas can show #NAME?.</p>
+<p>Need to catch near-duplicates that exact formulas miss, such as &quot;Acme Pty Ltd&quot; and &quot;ACME Pty. Ltd&quot;? The Data Cleanup Kit for Google Sheets (US$15, no add-on install) groups them for you with FUZZYDUPES, and adds ready-made tabs for merging and summing, keeping the latest row, comparing lists, splitting names and cleaning text: <a href="https://snakback.gumroad.com/l/data-cleanup-kit">snakback.gumroad.com/l/data-cleanup-kit</a></p>
+<p>Snakbacks publishes the Duplicate Remover and Fuzzy Match add-ons.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<div class="related"><h2 style="font-size:1.2rem;margin-top:0">More lookups and matching guides</h2><ul class="guide-list"><li><a href="/vlookup-na-error-google-sheets">VLOOKUP Returns #N/A in Google Sheets: Causes and Fixes</a></li><li><a href="/vlookup-partial-match-google-sheets">VLOOKUP Partial Match in Google Sheets (Wildcards, Contains)</a></li><li><a href="/xlookup-google-sheets">XLOOKUP in Google Sheets: Syntax, Wildcards and Examples</a></li><li><a href="/index-match-google-sheets">INDEX MATCH in Google Sheets: Syntax, Examples, vs VLOOKUP</a></li></ul><p><a href="/guides">All guides</a></p></div>
+</article></div>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div class="foot-grid">
+<div><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<p class="muted">A small Australian studio making Google Sheets add-ons.</p>
+<p>info@snakbacks.com<br>PO Box 1400, Burpengary D.C. QLD 4505, Australia</p></div>
+<div><h2>Products</h2><ul>
+<li><a href="/fuzzy-match">Fuzzy Match</a></li><li><a href="/duplicate-remover">Duplicate Remover</a></li><li><a href="/pro">Snakbacks Pro</a></li></ul></div>
+<div><h2>Resources</h2><ul>
+<li><a href="/guides">Guides</a></li><li><a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a></li><li><a href="https://snakback.gumroad.com/l/data-cleanup-kit">Data Cleanup Kit</a></li><li><a href="https://snakback.gumroad.com/l/levenshtein-starter">Levenshtein starter (free)</a></li></ul></div>
+<div><h2>Studio</h2><ul>
+<li><a href="/about">About</a></li><li><a href="/takeover">Add-on takeover</a></li><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="mailto:info@snakbacks.com">Contact</a></li></ul></div>
+</div>
+<p class="fine">Google Sheets, Google Workspace and Google Workspace Marketplace are trademarks of Google LLC. Snakbacks is not affiliated with or endorsed by Google. No tracking or analytics on this site.</p>
+</div></footer>
+</body>
+</html>

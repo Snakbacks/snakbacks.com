@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How to Fuzzy Match in Google Sheets (3 Ways) | Snakbacks</title>
+<meta name="description" content="Google Sheets has no built-in fuzzy match. VLOOKUP, MATCH and XLOOKUP only find text that is identical, so &quot;Inytech&quot; will never find &quot;Initech&quot;, and &quot;ACME...">
+<link rel="canonical" href="https://www.snakbacks.com/fuzzy-match-google-sheets">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1a5fa0">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Snakbacks">
+<meta property="og:title" content="How to Fuzzy Match in Google Sheets (3 Ways) | Snakbacks">
+<meta property="og:description" content="Google Sheets has no built-in fuzzy match. VLOOKUP, MATCH and XLOOKUP only find text that is identical, so &quot;Inytech&quot; will never find &quot;Initech&quot;, and &quot;ACME...">
+<meta property="og:url" content="https://www.snakbacks.com/fuzzy-match-google-sheets">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"How to Fuzzy Match in Google Sheets (3 Ways)","author":{"@type":"Organization","name":"Snakbacks"},"publisher":{"@type":"Organization","name":"Snakbacks"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<nav aria-label="Main"><ul class="nav">
+<li><a href="/#products">Products</a></li>
+<li><a href="/guides" aria-current="page">Guides</a></li>
+<li><a href="/pro">Pro</a></li>
+<li><a href="/takeover">Takeover</a></li>
+<li><a href="/about">About</a></li>
+</ul></nav>
+</div></header>
+<main id="main">
+<div class="wrap"><article class="page-head prose">
+<p class="crumbs"><a href="/">Home</a> / <a href="/guides">Guides</a> / <a href="/guides#lookups">Lookups and matching</a></p>
+<h1 style="font-size:clamp(1.8rem,5vw,2.6rem)">How to Fuzzy Match in Google Sheets (3 Ways)</h1>
+<p class="ailine">Written with AI assistance; tested in a real Google Sheet.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<p>Google Sheets has no built-in fuzzy match. VLOOKUP, MATCH and XLOOKUP only find text that is identical, so &quot;Inytech&quot; will never find &quot;Initech&quot;, and &quot;ACME Pty. Ltd&quot; will never find &quot;Acme Pty Ltd&quot;. This page shows three ways to fix that, starting with the ones that need no add-on.</p>
+<h2>The problem in one example</h2>
+<p>You have a clean master list of customers with IDs, and a messy list from another system. You want the ID next to every messy name.</p>
+<p>Master list (columns D and E):</p>
+<ul><li>Initech, 101</li><li>Umbrella Corp, 102</li><li>Acme Pty Ltd, 103</li><li>Globex Corporation, 104</li></ul>
+<p>Messy names (column A, starting at A2):</p>
+<ul><li>ACME Pty. Ltd</li><li>Inytech</li><li>Corp Umbrella</li><li>Globex</li></ul>
+<p>A normal VLOOKUP returns #N/A for all four. Each one fails for a different reason: punctuation, a typo, word order and a shortened name. No single trick fixes all four, which is why there are three methods below.</p>
+<h2>Method 1: clean both sides, then look up (no add-on)</h2>
+<p>This handles case, extra spaces and punctuation. It does not handle typos or word order.</p>
+<p>In F2 on the master list, build a clean key and fill it down:</p>
+<pre><code>=LOWER(TRIM(REGEXREPLACE(D2,&quot;[^\w\s]&quot;,&quot;&quot;)))</code></pre>
+<p>Then in B2, clean the messy name the same way and look it up against the key column:</p>
+<pre><code>=IFERROR(INDEX($E$2:$E$100, MATCH(LOWER(TRIM(REGEXREPLACE(A2,&quot;[^\w\s]&quot;,&quot;&quot;))), $F$2:$F$100, 0)), &quot;&quot;)</code></pre>
+<p>&quot;ACME Pty. Ltd&quot; becomes &quot;acme pty ltd&quot;, which matches the key for Acme Pty Ltd, so you get 103. The other three rows return blank, because they are not just a formatting difference.</p>
+<p>If your spreadsheet uses a comma as the decimal mark, Sheets may want semicolons between arguments instead of commas.</p>
+<h2>Method 2: wildcards and word overlap (no add-on)</h2>
+<p>Use this when one name is a shortened version of the other.</p>
+<h3>Wildcard match</h3>
+<pre><code>=IFERROR(INDEX($E$2:$E$100, MATCH(&quot;*&quot;&amp;A2&amp;&quot;*&quot;, $D$2:$D$100, 0)), &quot;&quot;)</code></pre>
+<p>The asterisks mean &quot;anything before or after&quot;. &quot;Globex&quot; is found inside &quot;Globex Corporation&quot;, so you get 104. This only works when your messy text is contained in the master name, in the same word order.</p>
+<h3>Word overlap, for different word order</h3>
+<p>Put the messy name in G1, for example &quot;Corp Umbrella&quot;. Next to each master name, in H2, count how many of its words appear in the candidate, and fill down:</p>
+<pre><code>=SUMPRODUCT(--ISNUMBER(SEARCH(SPLIT(LOWER(REGEXREPLACE(TRIM($G$1),&quot;[^\w\s]&quot;,&quot;&quot;)),&quot; &quot;),LOWER(D2))))</code></pre>
+<p>Then pick the highest score:</p>
+<pre><code>=IF(MAX(H2:H100)=0,&quot;&quot;,INDEX(D2:D100,MATCH(MAX(H2:H100),H2:H100,0)))</code></pre>
+<p>&quot;Corp Umbrella&quot; scores 2 against Umbrella Corp, 1 against Globex Corporation and 0 against the rest, so it returns Umbrella Corp.</p>
+<p>Limits: it matches word fragments (the word &quot;corp&quot; is found inside &quot;Corporation&quot;, which is why that row scores 1), and a single typo inside a word scores zero. Check the best match by eye, and only trust it when the winner clearly beats the runner-up.</p>
+<h2>Method 3: typo-tolerant matching</h2>
+<p>To catch &quot;Inytech&quot; you need an edit-distance measure, which counts how many single-letter changes turn one string into another. Sheets does not have one, so you add it yourself.</p>
+<h3>Option A: a small Apps Script function (free)</h3>
+<p>Open Extensions &gt; Apps Script, paste this, and save:</p>
+<pre><code>function CLOSEST_MATCH(value, list, minScore) {
+  var target = norm_(value);
+  var min = (minScore === undefined || minScore === &quot;&quot;) ? 0.8 : minScore;
+  var items = [].concat.apply([], list);
+  var best = &quot;&quot;, bestScore = 0;
+  for (var i = 0; i &lt; items.length; i++) {
+    var cand = norm_(items[i]);
+    if (!cand) continue;
+    var score = 1 - lev_(target, cand) / Math.max(target.length, cand.length);
+    if (score &gt; bestScore) { bestScore = score; best = items[i]; }
+  }
+  return bestScore &gt;= min ? best : &quot;&quot;;
+}
+function norm_(s) {
+  return String(s).toLowerCase().replace(/[^\w\s]/g, &quot;&quot;).replace(/\s+/g, &quot; &quot;).trim();
+}
+function lev_(a, b) {
+  var prev = [], i, j;
+  for (j = 0; j &lt;= b.length; j++) prev[j] = j;
+  for (i = 1; i &lt;= a.length; i++) {
+    var cur = [i];
+    for (j = 1; j &lt;= b.length; j++) {
+      var cost = a.charAt(i - 1) === b.charAt(j - 1) ? 0 : 1;
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + cost);
+    }
+    prev = cur;
+  }
+  return prev[b.length];
+}</code></pre>
+<p>Use it in a cell, one row at a time, and fill down:</p>
+<pre><code>=CLOSEST_MATCH(A2, $D$2:$D$100, 0.8)</code></pre>
+<p>&quot;Inytech&quot; returns Initech. &quot;Corp Umbrella&quot; still returns blank, because the letters are in a different order. Custom functions are slow on thousands of rows, since each cell scans the whole list.</p>
+<h3>Option B: the Fuzzy Match add-on (free)</h3>
+<p>Disclosure: Snakbacks, the publisher of this site, makes a free add-on called Fuzzy Match: Fuzzy VLOOKUP for Sheets. It adds three formulas that tolerate typos, case, punctuation and word order, and each accepts a whole column:</p>
+<pre><code>=FUZZYMATCH(A2:A100, Customers!A2:A, 0.8)
+=FUZZYLOOKUP(A2:A100, Customers!A2:A, Customers!C2:C, 0.8)
+=FUZZYSCORE(A2, B2)</code></pre>
+<p>FUZZYMATCH returns the closest value from your clean list. FUZZYLOOKUP is like XLOOKUP but fuzzy: it finds the closest row and returns any column from it, such as an ID. FUZZYSCORE returns a similarity from 0 to 1. Everything runs inside your sheet.</p>
+<p>Install it free from the Google Workspace Marketplace: <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Fuzzy Match on the Marketplace</a>.</p>
+<p>Tip: after installing, open Extensions &gt; Fuzzy Match &gt; How to use once in each new spreadsheet. Until you do, its formulas can show #NAME?.</p>
+<p>If you cannot install add-ons, or prefer to own the code: Fuzzy Match Template for Google Sheets (US$9, no add-on install): <a href="https://snakback.gumroad.com/l/fuzzy-formulas">snakback.gumroad.com/l/fuzzy-formulas</a>. It is the same three formulas as Apps Script you paste in once, or get by copying a template sheet. Snakbacks sells this pack.</p>
+<h2>Which method should you pick?</h2>
+<ul><li>Only case, spaces or punctuation differ: Method 1. Quick and exact.</li><li>Names are shortened versions of each other: Method 2, wildcard.</li><li>Word order differs: Method 2 word overlap, or the add-on.</li><li>Typos: Method 3, either option.</li><li>Thousands of rows, repeated often: the add-on, since the formulas fill a whole column in one go.</li></ul>
+<h2>Choosing a threshold</h2>
+<p>Fuzzy matching returns a score from 0 (nothing alike) to 1 (identical). You decide the cut-off:</p>
+<ul><li>0.9: strict. Very few wrong matches, but you will miss some real ones.</li><li>0.8: a sensible default.</li><li>0.7: loose. Catches more, and also produces more wrong matches.</li></ul>
+<p>Start at 0.8, then sort the matches by score and read the lowest few by eye. If they look wrong, raise the threshold. If real matches are being left blank, lower it. A blank cell is better than a confident wrong answer.</p>
+<h2>FAQ</h2>
+<h3>Does XLOOKUP help?</h3>
+<p>Google Sheets has XLOOKUP, but it is an exact-match function. It will not forgive typos unless you pair it with a cleaned key column as in Method 1.</p>
+<h3>Is my data safe?</h3>
+<p>Methods 1 and 2 are plain formulas. The Apps Script runs under your own account. The Fuzzy Match add-on works inside the spreadsheet you open it in.</p>
+<h3>How big a list can I use?</h3>
+<p>Plain formulas handle thousands of rows comfortably. The Apps Script version slows down because each row is compared with every master row.</p>
+<p>Snakbacks publishes the Duplicate Remover and Fuzzy Match add-ons.</p>
+<aside class="callout" aria-label="Free add-on"><img src="/assets/fuzzy-icon-128.png" alt="" width="44" height="44" loading="lazy"><div>
+<p><span class="t">Fuzzy Match</span> <span class="tag">Free add-on</span></p>
+<p>Match messy text to a clean list despite typos, case, punctuation or word order, with the formulas FUZZYMATCH, FUZZYLOOKUP and FUZZYSCORE.</p>
+<p><a href="/fuzzy-match">About Fuzzy Match</a> &middot; <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a></p></div></aside>
+<div class="related"><h2 style="font-size:1.2rem;margin-top:0">More lookups and matching guides</h2><ul class="guide-list"><li><a href="/vlookup-na-error-google-sheets">VLOOKUP Returns #N/A in Google Sheets: Causes and Fixes</a></li><li><a href="/vlookup-partial-match-google-sheets">VLOOKUP Partial Match in Google Sheets (Wildcards, Contains)</a></li><li><a href="/xlookup-google-sheets">XLOOKUP in Google Sheets: Syntax, Wildcards and Examples</a></li><li><a href="/index-match-google-sheets">INDEX MATCH in Google Sheets: Syntax, Examples, vs VLOOKUP</a></li></ul><p><a href="/guides">All guides</a></p></div>
+</article></div>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div class="foot-grid">
+<div><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<p class="muted">A small Australian studio making Google Sheets add-ons.</p>
+<p>info@snakbacks.com<br>PO Box 1400, Burpengary D.C. QLD 4505, Australia</p></div>
+<div><h2>Products</h2><ul>
+<li><a href="/fuzzy-match">Fuzzy Match</a></li><li><a href="/duplicate-remover">Duplicate Remover</a></li><li><a href="/pro">Snakbacks Pro</a></li></ul></div>
+<div><h2>Resources</h2><ul>
+<li><a href="/guides">Guides</a></li><li><a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a></li><li><a href="https://snakback.gumroad.com/l/data-cleanup-kit">Data Cleanup Kit</a></li><li><a href="https://snakback.gumroad.com/l/levenshtein-starter">Levenshtein starter (free)</a></li></ul></div>
+<div><h2>Studio</h2><ul>
+<li><a href="/about">About</a></li><li><a href="/takeover">Add-on takeover</a></li><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="mailto:info@snakbacks.com">Contact</a></li></ul></div>
+</div>
+<p class="fine">Google Sheets, Google Workspace and Google Workspace Marketplace are trademarks of Google LLC. Snakbacks is not affiliated with or endorsed by Google. No tracking or analytics on this site.</p>
+</div></footer>
+</body>
+</html>
