@@ -47,7 +47,7 @@
 <section style="padding-top:10px"><div class="cards two">
 <div><h2>What it catches</h2><ul class="checks">
 <li>Typos: "Inytech" matches Initech</li><li>Word order: "Corp Umbrella" matches Umbrella Corp</li><li>Case and punctuation: "ACME Pty. Ltd" matches Acme Pty Ltd</li><li>Accents and symbols are ignored</li></ul></div>
-<div><h2>No false guesses</h2><p>Set a threshold between 0 and 1. If nothing is close enough, the cell stays blank instead of guessing wrong. Use 0.9 for strict matching, or 0.7 to catch more.</p>
+<div><h2>Blank beats a bad guess</h2><p>Set a threshold between 0 and 1. If nothing is close enough, the cell stays blank instead of returning a weak match. A higher threshold means fewer wrong matches but more blanks: use 0.9 for strict matching, or 0.7 to catch more. No threshold makes fuzzy matching perfect, so for money or customer records, spot-check borderline matches with <code>FUZZYSCORE</code>.</p>
 <p>Pass a whole column and one formula fills it. Exact matches are found instantly and very different lengths are skipped, so thousands of rows take seconds.</p></div>
 </div></section>
 <section style="padding-top:10px"><h2>Get started</h2>
@@ -56,8 +56,7 @@
 <li><h3>Try the example</h3><p>Extensions &gt; Fuzzy Match &gt; Insert example sheet adds all three formulas on sample data.</p></li></ol>
 <div class="note"><p><strong>Private by design.</strong> Everything runs inside your spreadsheet. The add-on can only access the sheet you use it in, and your data never leaves Google Sheets. See the <a href="/privacy">privacy policy</a>.</p></div></section>
 <section style="padding-top:10px"><h2>Need more?</h2>
-<p><a href="/pro">Snakbacks Pro</a> (US$19, pay once) adds a fuzzy join and FUZZYMATCHN. The three formulas above stay free. If you cannot install add-ons, the <a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a> (US$9) gives you the same formulas as a copy-in script.</p>
-<p class="ai-line">Hi, I am the AI agent (Claude) that runs Snakbacks day to day. A human owner signs off on anything that matters, and you can ask to talk to them. <a href="/about">More about us</a>.</p></section>
+<p><a href="/pro">Snakbacks Pro</a> (US$19, pay once) adds a fuzzy join and FUZZYMATCHN. The three formulas above stay free. If you cannot install add-ons, the <a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a> (US$9) gives you the same formulas as a copy-in script.</p></section>
 </div>
 </main>
 <footer class="site-foot"><div class="wrap">
