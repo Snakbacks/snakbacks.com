@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Free online fuzzy match tool: match two lists | Snakbacks</title>
+<meta name="description" content="Free online fuzzy match tool. Paste two lists and match messy names to a clean list despite typos, case, punctuation and word order. Runs in your browser; nothing is uploaded.">
+<link rel="canonical" href="https://www.snakbacks.com/fuzzy-match-tool">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1a5fa0">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Snakbacks">
+<meta property="og:title" content="Free online fuzzy match tool: match two lists | Snakbacks">
+<meta property="og:description" content="Free online fuzzy match tool. Paste two lists and match messy names to a clean list despite typos, case, punctuation and word order. Runs in your browser; nothing is uploaded.">
+<meta property="og:url" content="https://www.snakbacks.com/fuzzy-match-tool">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Snakbacks fuzzy match tool","url":"https://www.snakbacks.com/fuzzy-match-tool","applicationCategory":"UtilitiesApplication","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"Snakbacks"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<nav aria-label="Main"><ul class="nav">
+<li><a href="/#products">Products</a></li>
+<li><a href="/guides">Guides</a></li>
+<li><a href="/pro">Pro</a></li>
+<li><a href="/takeover">Takeover</a></li>
+<li><a href="/about">About</a></li>
+</ul></nav>
+</div></header>
+<main id="main">
+<div class="wrap"><div class="page-head"><p class="crumbs"><a href="/">Home</a> / Free fuzzy match tool</p>
+<h1 style="font-size:clamp(1.8rem,5vw,2.7rem)">Free online fuzzy match tool</h1>
+<p class="lede">Paste two lists and match each messy value to the closest name in a clean list, despite typos, capitals, punctuation and word order. No sign-up.</p>
+<ul class="trust"><li>Runs in your browser: nothing is uploaded</li><li>Up to 10,000 lines per list</li><li>Same engine as our Google Sheets add-on</li></ul></div>
+<section class="tool" style="padding-top:18px" aria-label="Fuzzy match tool">
+<div class="tool-grid">
+<div><label for="ft-values"><strong>1. Values to match</strong> <span class="muted small">(the messy list, one per line)</span></label>
+<textarea id="ft-values" rows="10" spellcheck="false" placeholder="ACME Pty. Ltd&#10;Inytech&#10;Corp Umbrella"></textarea></div>
+<div><label for="ft-lookup"><strong>2. Clean list</strong> <span class="muted small">(what to match against, one per line)</span></label>
+<textarea id="ft-lookup" rows="10" spellcheck="false" placeholder="Acme Pty Ltd&#10;Initech&#10;Umbrella Corp"></textarea></div>
+</div>
+<p class="muted small">Copy a column from Google Sheets or Excel and paste it in. If you paste several columns, only the first is used. Blank lines are kept so the results line up with your rows.</p>
+<div class="tool-bar">
+<label for="ft-th" class="th-label">Threshold <output id="ft-th-out" for="ft-th">0.80</output></label>
+<input id="ft-th" type="range" min="0.5" max="1" step="0.05" value="0.8" aria-describedby="ft-th-help">
+<button id="ft-run" class="btn" type="button">Match</button>
+<button id="ft-example" class="btn ghost" type="button">Try an example</button>
+<button id="ft-clear" class="btn ghost small" type="button">Clear</button>
+</div>
+<p id="ft-th-help" class="muted small">Higher means stricter. At 0.8 a value needs a score of 0.8 or more to match; anything less stays blank instead of guessing. Try 0.7 to catch more, or 0.9 for fewer wrong matches.</p>
+<p id="ft-status" class="ft-status" role="status" aria-live="polite"></p>
+<div id="ft-out" hidden>
+<h2 style="font-size:1.3rem;margin-top:8px">Results</h2>
+<p id="ft-summary" class="muted"></p>
+<div class="row" style="margin-bottom:12px"><button id="ft-copy" class="btn small" type="button">Copy matches column</button><button id="ft-csv" class="btn small ghost" type="button">Download CSV</button></div>
+<div class="sheet"><div class="scroll ft-scroll"><table><thead><tr><th></th><th>Value</th><th>Match</th><th>Score</th><th>Result</th></tr></thead><tbody id="ft-body"></tbody></table></div></div>
+<p id="ft-more" class="muted small" hidden></p>
+<div class="note" style="margin-top:22px"><p><strong>Doing this every week?</strong> The free <a href="/fuzzy-match">Fuzzy Match add-on</a> does the same matching inside Google Sheets with one formula, and updates when your data changes: <code id="ft-formula">=FUZZYMATCH(A2:A, Clean!A2:A, 0.8)</code> <a href="https://workspace.google.com/marketplace/app/fuzzy_match_fuzzy_vlookup_for_google_she/250583114112">Get it on the Marketplace</a>.</p></div>
+</div>
+</section>
+<section style="padding-top:6px"><div class="prose">
+<h2>How the matching works</h2>
+<p>Both lists are cleaned first: capitals, accents and punctuation are ignored, so "ACME Pty. Ltd" and "Acme Pty Ltd" are treated as the same. Exact matches are found straight away. For everything else, each value gets a similarity score from 0 (nothing alike) to 1 (identical) against every name in the clean list, and the best one wins if it reaches your threshold.</p>
+<p>The score is the highest of three measures: Jaro-Winkler similarity on the whole text (good at typos like "Inytech" and "Initech"), the same on the words sorted alphabetically (so "Corp Umbrella" matches "Umbrella Corp"), and how many whole words the two share.</p>
+<p>To keep big lists fast, names of very different lengths are skipped at high thresholds, exactly as in the add-on. So "Globex" only matches "Globex Corporation" at a threshold of 0.65 or lower; the tool tells you when that happens.</p>
+<h2>Check the borderline matches</h2>
+<p>No threshold makes fuzzy matching perfect. Two different companies can have similar names, and a short name can sit close to several others. Sort by score and look over anything between your threshold and about 0.9 before you rely on it, especially for invoices or customer records. Rows marked "No match" show the closest candidate in grey, so you can see whether lowering the threshold would help.</p>
+<h2>Is my data private?</h2>
+<p>Yes. The matching runs as JavaScript in this page, on your device. Your lists are never sent to us or anyone else, and this site has no tracking or analytics. You can check by disconnecting from the internet after the page loads: it still works.</p>
+<h2>Related guides</h2>
+<ul class="guide-list"><li><a href="/fuzzy-match-google-sheets">How to Fuzzy Match in Google Sheets (3 Ways)</a></li><li><a href="/match-names-with-typos-google-sheets">Match Names with Typos in Google Sheets (Fuzzy Name Matching)</a></li><li><a href="/compare-two-columns-duplicates">Compare Two Columns in Google Sheets and Find Duplicates</a></li><li><a href="/standardize-company-names-google-sheets">Standardize Company Names in Google Sheets (Clean Key + Mapping Table)</a></li></ul>
+<p class="ai-line">Snakbacks is a small Australian studio. An AI agent (Claude) does the day-to-day work, and a human owner is accountable for the products and signs off on anything that matters. <a href="/about">More about us</a>.</p>
+</div></section></div>
+<script src="/assets/fuzzy-tool.js" defer></script>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div class="foot-grid">
+<div><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1a5fa0"/><rect x="12" y="14" width="26" height="9" rx="3" fill="#fff"/><rect x="12" y="28" width="26" height="9" rx="3" fill="#fff" opacity=".7"/><rect x="12" y="42" width="26" height="9" rx="3" fill="#fff" opacity=".45"/><rect x="42" y="28" width="12" height="9" rx="3" fill="#ffcf5f"/></svg><span>Snakbacks</span></a>
+<p class="muted">A small Australian studio making Google Sheets add-ons.</p>
+<p>info@snakbacks.com<br>PO Box 1400, Burpengary D.C. QLD 4505, Australia</p></div>
+<div><h2>Products</h2><ul>
+<li><a href="/fuzzy-match">Fuzzy Match</a></li><li><a href="/duplicate-remover">Duplicate Remover</a></li><li><a href="/pro">Snakbacks Pro</a></li></ul></div>
+<div><h2>Resources</h2><ul>
+<li><a href="/guides">Guides</a></li><li><a href="/fuzzy-match-tool">Free fuzzy match tool</a></li><li><a href="https://snakback.gumroad.com/l/fuzzy-formulas">Fuzzy Match Template</a></li><li><a href="https://snakback.gumroad.com/l/data-cleanup-kit">Data Cleanup Kit</a></li><li><a href="https://snakback.gumroad.com/l/levenshtein-starter">Levenshtein starter (free)</a></li></ul></div>
+<div><h2>Studio</h2><ul>
+<li><a href="/about">About</a></li><li><a href="/takeover">Add-on takeover</a></li><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="mailto:info@snakbacks.com">Contact</a></li></ul></div>
+</div>
+<p class="fine">Google Sheets, Google Workspace and Google Workspace Marketplace are trademarks of Google LLC. Snakbacks is not affiliated with or endorsed by Google. No tracking or analytics on this site.</p>
+</div></footer>
+</body>
+</html>
