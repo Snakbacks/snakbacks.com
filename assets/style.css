@@ -168,3 +168,23 @@ details p{margin:.6em 0 0}
 .hero .grid>*,.cards>*,.steps>*,.two-col>*{min-width:0}
 .card>.tag{align-self:flex-start}
 .sheet-cap{overflow-wrap:anywhere}
+
+/* free fuzzy match tool */
+.tool-grid{display:grid;gap:18px}
+@media(min-width:760px){.tool-grid{grid-template-columns:1fr 1fr}}
+.tool-grid>*{min-width:0}
+.tool label{display:block;margin-bottom:6px}
+.tool textarea{width:100%;min-height:200px;resize:vertical;font:0.92rem/1.5 ui-monospace,"Cascadia Code",Consolas,Menlo,monospace;background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.tool textarea:focus{border-color:var(--accent)}
+.tool-bar{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:center;margin:14px 0 4px}
+.tool-bar .th-label{margin:0;font-weight:600;white-space:nowrap}
+.tool-bar output{display:inline-block;min-width:2.6em;font-variant-numeric:tabular-nums;color:var(--accent)}
+.tool-bar input[type=range]{flex:1 1 160px;max-width:260px;accent-color:var(--accent)}
+.tool button.btn{cursor:pointer;font-family:inherit}
+.tool button.btn:disabled{opacity:.6;cursor:progress}
+.ft-status{min-height:1.6em;font-weight:600;margin:6px 0}
+.ft-scroll{max-height:520px;overflow:auto}
+.tool .sheet td{white-space:normal;min-width:6em}
+.tool .sheet tr.exact td:nth-child(3),.tool .sheet tr.fuzzy td:nth-child(3){background:var(--green-soft);color:var(--green);font-weight:600}
+.tool .sheet tr.none td:last-child{color:var(--amber)}
+.tool .sheet thead th{position:sticky;top:0}
